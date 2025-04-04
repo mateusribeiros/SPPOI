@@ -1,2 +1,2 @@
-# SPPOI-
-Ferramenta para suporte à integração/interoperabilidade entre sistemas. Fornece um usabilidade simplificada para apresentar sugestões personalizadas ao usuário com auxílio de Inteligência Artificial Generativa treinada, além da ferramenta priorizar a confidencialidade das informações preenchidas. 
+# SPPOI - Structured Process for Pattern-Oriented Integration
+Tool to support integration/interoperability between systems. It offers simplified usability to present personalized suggestions to the user with the help of a trained Generative Artificial Intelligence, while also prioritizing the confidentiality of the information provided.
