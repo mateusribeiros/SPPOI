@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-from decouple import config
+from decouple import config # type: ignore
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,12 +23,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = []
-
+STATICFILES_DIRS = [
+    BASE_DIR / "SPPOI/templates/static",
+]
 
 # Application definition
 
 INSTALLED_APPS = [
+    'SPPOI',
+    'django_cron',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -118,3 +121,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Usa banco de dados para armazenar sessões
+SESSION_COOKIE_AGE = 24 * 60 * 60  # A sessão vai expirar em 24 horas
+
+CRONJOBS = [
+    ('0 0 * * *', 'app.cron.ClearExpiredDataCronJob'),
+]

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Armazenamento Temporário</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 700px; margin: auto; }
+        input, textarea, button { margin: 5px 0; padding: 8px; width: 100%; }
+        pre { background-color: #f4f4f4; padding: 10px; white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <h1>Teste de Armazenamento Temporário</h1>
+
+    <h2>Salvar dados</h2>
+    <textarea id="jsonInput" rows="5" placeholder='{"nome": "Mateus", "mensagem": "Oi"}'></textarea>
+    <button onclick="sendData()">Enviar</button>
+
+    <h2>Buscar dados</h2>
+    <input id="keyInput" type="text" placeholder="Cole aqui a chave retornada (ex: temp:uuid)">
+    <button onclick="getData()">Buscar</button>
+
+    <h2>Resultado</h2>
+    <pre id="responseBox">Aguardando ação...</pre>
+
+    <script>
+        function sendData() {
+            const jsonData = document.getElementById("jsonInput").value;
+
+            try {
+                JSON.parse(jsonData);
+            } catch (e) {
+                document.getElementById("responseBox").textContent = "JSON inválido: " + e.message;
+                return;
+            }
+
+            fetch("/api/store/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: jsonData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("responseBox").textContent = JSON.stringify(data, null, 2);
+                if (data.key) {
+                    document.getElementById("keyInput").value = data.key;
+                }
+            })
+            .catch(error => {
+                document.getElementById("responseBox").textContent = "Erro ao enviar: " + error;
+            });
+        }
+
+        function getData() {
+            const input = document.getElementById("keyInput").value.trim();
+
+            if (!input) {
+                document.getElementById("responseBox").textContent = "Por favor, informe uma chave ou nome.";
+                return;
+            }
+
+            fetch(`/retrieve/?key=${encodeURIComponent(input)}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("responseBox").textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    document.getElementById("responseBox").textContent = "Erro ao buscar: " + error;
+                });
+        }
+    </script>
+</body>
+</html>

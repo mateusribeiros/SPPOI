@@ -1,0 +1,175 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Registro de Sistema</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'bootstrap/assets/favicon.ico'}" />
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Google fonts-->
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,600;1,600&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300;0,500;0,600;0,700;1,300;1,500;1,600;1,700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;1,400&amp;display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="{% static 'bootstrap/css/styles.css'%}" rel="stylesheet" /> 
+
+
+<!-- JS + jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+</head>
+<body id="page-top">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
+        <div class="container px-5">
+            <a class="navbar-brand fw-bold" href="#page-top">SPPOI</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                Menu
+                <i class="bi-list"></i>
+            </button>
+        </div>
+    </nav>
+    <header class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+        <div class="container w-75">
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <div class="card shadow p-4">
+                        <div class="card-body">
+                            <h3 class="card-title mb-3 text-center">Registre</h3>
+                            <p class="text-center mb-4">Preencha os campos abaixo.</p>
+                            <form class="needs-validation" novalidate>
+    
+                                <div class="col-md-12 mb-3">
+                                    <input class="form-control" type="text" name="name" placeholder="Nome do sistema" required>
+                                    <div class="invalid-feedback">O campo de nome não deve estar em branco!</div>
+                                </div>
+    
+                                <div class="col-md-12 mb-3">
+                                    <textarea class="form-control" name="description" placeholder="Descrição" rows="4" cols="50"></textarea>
+                                </div>
+    
+                                <div class="col-md-12 mb-3">
+                                    <select class="form-select" required>
+                                        <option selected disabled value="">Tipo de sistema</option>
+                                        <option value="type_bi">BI - Business Intelligence</option>
+                                        <option value="type_crm">CRM - Customer Relationship Management</option>
+                                        <option value="type_erp">ERP - Enterprise Resource Planning</option>
+                                        <option value="type_gateway_payment">Gateway de pagamentos</option>
+                                        <option value="type_scm">SCM - Supply Chain Management</option>
+                                        <option value="type_wms">WMS - Warehouse Management System</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please select a position!</div>
+                                </div>
+                                
+                                <div class="col-md-12 mb-3">
+                                    <input class="form-control" type="text" name="version" placeholder="Versão" required>
+                                    <div class="invalid-feedback">O campo de nome não deve estar em branco!</div>
+                                </div>
+    
+                                <div class="col-md-12 mb-3">
+                                    <textarea class="form-control" name="main_funcionality" placeholder="Funcionalidade principal" rows="4" cols="50"></textarea>
+                                </div>
+    
+                                <div class="col-md-12 mb-3">
+                                    <label for="protocolosSuportados" class="form-label">Protocolos Suportados</label>
+                                    <select class="form-select" id="protocolosSuportados" name="protocolos[]" multiple required style="width: 100%">
+                                        <option value="http">HTTP</option>
+                                        <option value="https">HTTPS</option>
+                                        <option value="soap">SOAP (via HTTP)</option>
+                                        <option value="amqp">AMQP</option>
+                                        <option value="mqtt">MQTT</option>
+                                        <option value="websockets">WebSockets</option>
+                                        <option value="sftp">SFTP</option>
+                                        <option value="grpc">gRPC</option>
+                                        <option value="odata">OData</option>
+                                    </select>
+                                </div>
+    
+                                <div class="col-md-12 mb-4">
+                                    <label for="data_manipulation_format" class="form-label">Capacidades de manipulação de dados</label>
+                                    <select class="form-select" id="data_manipulation_format" name="data_manipulation_format[]" multiple required style="width: 100%">
+                                        <option value="json">JSON</option>
+                                        <option value="xml">XML</option>
+                                        <option value="csv">CSV</option>
+                                        <option value="yaml">YAML</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <div class="col-md-12 mb-3">Informações do responsável</div>
+
+                                    <div class="col-md-12 mb-3">
+                                        <input class="form-control" type="email" name="responsible_mail" placeholder="E-mail" required>
+                                        <div class="invalid-feedback">O campo de nome não deve estar em branco!</div>
+                                    </div>
+
+                                    <div class="col-md-12 mb-3">
+                                        <input class="form-control" type="tel" name="responsible_phone" placeholder="Telefone">
+                                        <div class="invalid-feedback">O campo de nome não deve estar em branco!</div>
+                                    </div>
+
+                                    <div class="col-md-12 mb-3">
+                                        <input class="form-control" type="text" name="maintainer" placeholder="Mantenedor do sistema">
+                                        <div class="invalid-feedback">O campo de nome não deve estar em branco!</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-12 mb-4">
+                                    <label for="authentication_requirements" class="form-label">Requisitos de Autênticação</label>
+                                    <select class="form-select" id="authentication_requirements" name="authentication_requirements[]" multiple required style="width: 100%">
+                                        <option value="oauth">OAuth</option>
+                                        <option value="basic_auth">Basic Auth</option>
+                                        <option value="api_keys">API Keys</option>
+                                        <option value="bearer_token">Bearer Token</option>
+                                    </select>
+                                </div>
+
+                                <div class="d-grid">
+                                    <button id="submit" type="submit" class="btn btn-primary">Registrar</button>
+                                </div>
+    
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>    
+    <footer class="bg-black text-center py-5">
+        <div class="container px-5">
+            <div class="text-white-50 small">
+                <div class="mb-2">&copy; Your Website 2023. All Rights Reserved.</div>
+                <a href="#!">Privacy</a>
+                <span class="mx-1">&middot;</span>
+                <a href="#!">Terms</a>
+                <span class="mx-1">&middot;</span>
+                <a href="#!">FAQ</a>
+            </div>
+        </div>
+    </footer>
+    <script src="{% static 'bootstrap/js/registerSystem.js'%}"></script>
+    <script>
+        $('#protocolosSuportados').select2({
+            placeholder: "Selecione os protocolos suportados",
+            dropdownAutoWidth: true,
+            width: 'resolve'
+        });
+        $('#data_manipulation_format').select2({
+            placeholder: "Selecione os formatos suportados",
+            dropdownAutoWidth: true,
+            width: 'resolve'
+        });
+        $('#authentication_requirements').select2({
+            placeholder: "Selecione os requisitos suportados",
+            dropdownAutoWidth: true,
+            width: 'resolve'
+        });
+    </script>
+</body>
+</html>
