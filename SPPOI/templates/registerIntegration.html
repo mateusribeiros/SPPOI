@@ -1,0 +1,250 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Registro dos Estilos de Integração</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'bootstrap/assets/favicon.ico'}" />
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Google fonts-->
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,600;1,600&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300;0,500;0,600;0,700;1,300;1,500;1,600;1,700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;1,400&amp;display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="{% static 'bootstrap/css/styles.css'%}" rel="stylesheet" /> 
+
+
+<!-- JS + jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+</head>
+<body id="page-top" class="pt-5">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
+        <div class="container px-5">
+            <a class="navbar-brand fw-bold" href="{% url 'render_lab' %}">SPPOI</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                Menu
+                <i class="bi-list"></i>
+            </button>
+        </div>
+    </nav>
+    <header class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+        <div class="container w-75">
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <div class="card shadow p-4">
+                        <div class="card-body">
+                            <h3 class="card-title mb-3 text-center">Registre</h3>
+                            <p class="text-center mb-4">Preencha os campos abaixo.</p>
+                            <form action="{% url 'register_integration' project.id %}" class="needs-validation" method="post">
+                                {% csrf_token %}
+
+                                {% if messages %}
+                                <div class="container mt-4">
+                                    {% for message in messages %}
+                                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                            {{ message }}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Seleção de Sistemas -->    
+                                <div class="mb-3">
+                                    <label class="form-label">Sistema de Origem</label>
+                                    <select name="sistema_origem_id" class="form-select" required>
+                                        <option selected disabled value="">Selecione o sistema de origem</option>
+                                        {% for sistema in mSystems %}
+                                            <option value="{{ sistema.id }}">{{ sistema.nome }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            
+                                <div class="mb-3">
+                                    <label class="form-label">Sistema de Destino</label>
+                                    <select name="sistema_destino_id" class="form-select" required>
+                                        <option selected disabled value="">Selecione o sistema de destino</option>
+                                        {% for sistema in mSystems %}
+                                            <option value="{{ sistema.id }}">{{ sistema.nome }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            
+                                <!-- Estilo de Integração -->
+                                <div class="mb-3">
+                                    <label class="form-label">Estilo de Integração</label>
+                                    <select name="estilo" id="estiloSelect" class="form-select" required>
+                                        <option selected disabled value="">Selecione o estilo</option>
+                                        <option value="Banco Compartilhado">Compartilhamento de Banco de Dados</option>
+                                        <option value="Mensageria">Mensageria</option>
+                                        <option value="RPC">RPC (Chamada de Procedimento Remoto)</option>
+                                        <option value="Arquivo">Troca de Arquivos</option>
+                                    </select>
+                                </div>
+                            
+                                <!-- Campos Condicionais -->
+                                <div id="camposBanco" style="display: none;">
+                                    <h5>Banco de Dados</h5>
+                                    <input type="text" name="tipo_banco" class="form-control mb-2" placeholder="Tipo de Banco (SQL, NoSQL)">
+                                    <input type="text" name="host" class="form-control mb-2" placeholder="Host">
+                                    <input type="text" name="porta" class="form-control mb-2" placeholder="Porta">
+                                    <input type="text" name="nome_banco" class="form-control mb-2" placeholder="Nome do Banco">
+                                    <input type="text" name="usuario" class="form-control mb-2" placeholder="Usuário">
+                                    <input type="password" name="senha" class="form-control mb-2" placeholder="Senha">
+                                    <textarea name="tabelas_compartilhadas" class="form-control mb-2" rows="2" placeholder="Tabelas/Visões compartilhadas"></textarea>
+                                    <select name="sincronizacao" class="form-select mb-2">
+                                        <option selected disabled value="">Agendamento de Sincronização</option>
+                                        <option value="Tempo real">Tempo real</option>
+                                        <option value="Processamento em lote">Processamento em lote</option>
+                                    </select>
+                                </div>
+                            
+                                <div id="camposMensageria" style="display: none;">
+                                    <h5>Mensageria</h5>
+                                    <input type="text" name="broker" class="form-control mb-2" placeholder="Broker (ex: Kafka, RabbitMQ)">
+                                    <input type="text" name="topicos_filas" class="form-control mb-2" placeholder="Tópicos ou Filas">
+                                    <div class="mb-2">
+                                        <select id="formato_mensagem" name="formato_mensagem" class="form-select" multiple style="width: 100%">
+                                            <option value="JSON">JSON</option>
+                                            <option value="XML">XML</option>
+                                            <option value="Protobuf">Protocol Buffers</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            
+                                <div id="camposRPC" style="display: none;">
+                                    <h5>RPC</h5>
+                                    <select name="tipo_rpc" class="form-select mb-2">
+                                        <option selected disabled value="">Tipo de RPC</option>
+                                        <option value="Síncrono">Síncrono</option>
+                                        <option value="Assíncrono">Assíncrono</option>
+                                    </select>
+                                    <textarea name="definicoes_metodos" class="form-control mb-2" placeholder="Definições de métodos (nomes, parâmetros)" rows="3"></textarea>
+                                    <input type="text" name="endpoint_rpc" class="form-control mb-2" placeholder="Endpoint RPC">
+                                </div>
+                            
+                                <div id="camposArquivo" style="display: none;">
+                                    <h5>Troca de Arquivos</h5>
+                                    <div class="mb-2">
+                                        <select id="tipo_arquivo" name="tipo_arquivo" class="form-select" multiple style="width: 100%">
+                                            <option value="CSV">CSV</option>
+                                            <option value="JSON">JSON</option>DDC 
+                                            <option value="XML">XML</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-2">
+                                        <select id="protocolo_transferencia" name="protocolo_transferencia" class="form-select" multiple style="width: 100%">
+                                            <option value="FTP">FTP</option>
+                                            <option value="SFTP">SFTP</option>
+                                            <option value="HTTP">HTTP</option>
+                                        </select>
+                                    </div>
+                                    <input type="text" name="local_armazenamento" class="form-control mb-2" placeholder="Local de Armazenamento (diretório ou bucket)">
+                                    <input type="text" name="transformacao_arquivo" class="form-control mb-2" placeholder="Transformação de Arquivo (ex: JSON para CSV)">
+                                </div>
+                            
+                                <div class="d-grid mt-4">
+                                    <button type="submit" class="btn btn-primary" value="register">Registrar Estilo de Integração</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>    
+    <footer class="bg-black text-center py-5">
+        <div class="container px-5">
+            <div class="text-white-50 small">
+                <div class="mb-2">&copy; Your Website 2023. All Rights Reserved.</div>
+                <a href="#!">Privacy</a>
+                <span class="mx-1">&middot;</span>
+                <a href="#!">Terms</a>
+                <span class="mx-1">&middot;</span>
+                <a href="#!">FAQ</a>
+            </div>
+        </div>
+    </footer>
+    <script src="{% static 'bootstrap/js/registerSystem.js'%}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        const origemSelect = document.querySelector('[name="sistema_origem_id"]');
+        const destinoSelect = document.querySelector('[name="sistema_destino_id"]');
+        const form = document.querySelector('form');
+
+        form.addEventListener("submit", function (e) {
+            if (origemSelect.value === destinoSelect.value) {
+                e.preventDefault();
+                alert("O sistema de origem e destino não podem ser iguais.");
+            }
+        });
+
+        // Opcional: desabilita a opção já selecionada no outro select
+        origemSelect.addEventListener("change", function () {
+            updateOptions();
+        });
+
+        destinoSelect.addEventListener("change", function () {
+            updateOptions();
+        });
+
+        function updateOptions() {
+            const origemVal = origemSelect.value;
+            const destinoVal = destinoSelect.value;
+
+            destinoSelect.querySelectorAll("option").forEach(opt => {
+                opt.disabled = opt.value === origemVal && origemVal !== "";
+            });
+
+            origemSelect.querySelectorAll("option").forEach(opt => {
+                opt.disabled = opt.value === destinoVal && destinoVal !== "";
+            });
+        }
+        });
+
+        document.getElementById("estiloSelect").addEventListener("change", function () {
+        const valor = this.value;
+        const campos = {
+            "Banco Compartilhado": "camposBanco",
+            "Mensageria": "camposMensageria",
+            "RPC": "camposRPC",
+            "Arquivo": "camposArquivo"
+        };
+
+        for (const key in campos) {
+            document.getElementById(campos[key]).style.display = "none";
+        }
+
+        if (campos[valor]) {
+            document.getElementById(campos[valor]).style.display = "block";
+        }
+        });
+
+        $(document).ready(function () {
+            $('#protocolo_transferencia').select2({
+                placeholder: "Selecione os protocolos de transferência",
+                dropdownAutoWidth: true,
+                width: 'resolve'
+            });
+            $('#tipo_arquivo').select2({
+                placeholder: "Selecione os tipos de arquivos",
+                dropdownAutoWidth: true,
+                width: 'resolve'
+            });
+            $('#formato_mensagem').select2({
+                placeholder: "Selecione os formatos de dados",
+                dropdownAutoWidth: true,
+                width: 'resolve'
+            });
+        });
+    </script>
+</body>
+</html>

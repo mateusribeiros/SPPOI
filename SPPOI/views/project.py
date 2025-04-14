@@ -1,46 +1,70 @@
 from django.urls import reverse
-from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponseRedirect, JsonResponse
-from django.utils.timezone import now
-from django.shortcuts import get_object_or_404, render
-import json
+from django.views.decorators.http import require_http_methods
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib import messages
 from SPPOI.models import Projeto, Sistema, Interface, EstiloIntegracao
 
 # Verifica ou cria uma chave de sessão para o usuário
-def createSession(request):
+def create_session(request):
     if not request.session.session_key:
         request.session.create()
     return request.session.session_key
 
-@csrf_exempt
+
+@require_http_methods(["GET"])
 def render_project(request, id):
-    project = get_object_or_404(Projeto, pk=id)
-    mSystems = Sistema.objects.filter(projeto=project).values()
-    mInterfaces = Interface.objects.filter(projeto=project).values()
-    mIntegrationStyles = EstiloIntegracao.objects.filter(projeto=project)
+    try:
+        project = get_object_or_404(Projeto, pk=id)
+        mSystems = Sistema.objects.filter(projeto=project).values()
+        mInterfaces = Interface.objects.filter(projeto=project).values()
+        mIntegrationStyles = EstiloIntegracao.objects.filter(projeto=project)
 
-    context = {
-        'mSystems': mSystems,
-        'mInterfaces': mInterfaces,
-        'mIntegrationStyles': mIntegrationStyles,
-        'project': project,
-    }
-
-    return render(request, 'project.html', context)
-
-@csrf_exempt   
-def register_project(request):
-    if request.method == "POST":
-        session_key = createSession(request)
-
-        data = {
-            "nome": request.POST.get("project_name", ""),
-            "session_key": session_key,
+        context = {
+            'project': project,
+            'mSystems': mSystems,
+            'mInterfaces': mInterfaces,
+            'mIntegrationStyles': mIntegrationStyles,
         }
 
-        Projeto.objects.create(**data)
+        return render(request, 'project.html', context)
 
+    except Exception as e:
+        messages.error(request, f"Erro ao carregar o projeto: {str(e)}")
         return HttpResponseRedirect(reverse('render_lab'))
 
-    return HttpResponseRedirect(reverse('render_lab'))
 
+@require_http_methods(["POST"])
+def register_project(request):
+    try:
+        session_key = create_session(request)
+        project_name = request.POST.get("project_name", "").strip()
+
+        if not project_name:
+            messages.error(request, "O nome do projeto é obrigatório.")
+            return HttpResponseRedirect(reverse('render_lab'))
+
+        Projeto.objects.create(
+            nome=project_name,
+            session_key=session_key
+        )
+
+        messages.success(request, "Projeto criado com sucesso!")
+        return HttpResponseRedirect(reverse('render_lab'))
+
+    except Exception as e:
+        messages.error(request, f"Erro ao criar projeto: {str(e)}")
+        return HttpResponseRedirect(reverse('render_lab'))
+    
+@require_http_methods(["POST"])
+def delete(request, id):
+    try:
+        project = get_object_or_404(Projeto, pk=id)
+        project_nome = project.nome  # salva o nome antes de deletar
+        project.delete()
+        messages.success(request, f"Projeto '{project_nome}' deletado com sucesso.")
+
+    except Exception as e:
+        messages.error(request, f"Ocorreu um erro ao deletar o projeto: {str(e)}")
+
+    return redirect('render_lab')

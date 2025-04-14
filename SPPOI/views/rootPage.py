@@ -1,22 +1,28 @@
-from django.http import HttpResponse, HttpResponseRedirect
-from django.template import loader
-from django.shortcuts import render
+from django.http import HttpResponseRedirect
+from django.views.decorators.http import require_http_methods
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.views.decorators.csrf import csrf_exempt
-from SPPOI.models import Projeto, Sistema, Interface, EstiloIntegracao
+from django.views.decorators.http import require_GET
+from django.contrib import messages
+from SPPOI.models import Projeto
 
-@csrf_exempt
+@require_GET
 def index(request):
-    template = render(request, 'index.html')
-    return template
-
-@csrf_exempt
+    try:
+        return render(request, 'index.html')
+    except Exception as e:
+        messages.error(request, f"Erro ao carregar a página inicial: {str(e)}")
+        return render(request, 'index.html')
+    
+@require_http_methods(["GET"])
 def render_lab(request):
-    mProjects = Projeto.objects.all().values()
+    try:
+        project = Projeto.objects.all().values()
 
-    context = {
-        'mProjects': mProjects
-    }
+        return render(request, 'lab.html', {
+            'project': project
+        })
 
-    template = render(request,'lab.html', context)
-    return template
+    except Exception as e:
+        messages.error(request, f"Erro ao carregar os projetos: {str(e)}")
+        return render(request, 'lab.html', {'project': []})

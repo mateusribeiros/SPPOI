@@ -1,53 +1,87 @@
 from django.urls import reverse
-from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponseRedirect, JsonResponse
-from django.utils.timezone import now
-from django.shortcuts import get_object_or_404, render
-import json
-from SPPOI.models import Projeto, Sistema, Interface, EstiloIntegracao
+from django.views.decorators.http import require_http_methods
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib import messages
+from SPPOI.models import Projeto, Sistema
 
-@csrf_exempt
+
+@require_http_methods(["GET"])
 def render_system(request, id):
-    project = get_object_or_404(Projeto, pk=id)
-
-    context = {
-        'project': project
-    }
-
-    template = render(request,'registerSystem.html', context)
-    return template
-    
-@csrf_exempt
-def register(request, id):
-    if request.method == "POST":
+    try:
         project = get_object_or_404(Projeto, pk=id)
+
+        return render(request, 'registerSystem.html', {
+            'project': project
+        })
+
+    except Exception as e:
+        messages.error(request, f"Erro ao carregar a página de registro de sistema: {str(e)}")
+        return redirect(reverse('render_project', kwargs={'id': id}))
+
+
+@require_http_methods(["POST"])
+def register(request, id):
+    try:
+        project = get_object_or_404(Projeto, pk=id)
+
+        # Captura e validação básica de campos
+        nome = request.POST.get('name', '').strip()
+        if not nome:
+            raise ValueError("O nome do sistema é obrigatório.")
 
         data = {
             "projeto": project,
-            "nome": request.POST.get('name', ''),
-            "descricao": request.POST.get('description', ''),
-            "tipo": request.POST.get('type', ''),
-            "versao": request.POST.get('version', ''),
-            "funcionalidade_principal": request.POST.get('main_funcionality', ''),
+            "nome": nome,
+            "descricao": request.POST.get('description', '').strip(),
+            "tipo": request.POST.get('type', '').strip(),
+            "versao": request.POST.get('version', '').strip(),
+            "funcionalidade_principal": request.POST.get('main_funcionality', '').strip(),
             "protocolos_suportados": ", ".join(request.POST.getlist('protocolos[]')),
             "capacidades_dados": ", ".join(request.POST.getlist('data_manipulation_format[]')),
-            "email_responsavel": request.POST.get('responsible_mail', ''),
-            "contato_responsavel": request.POST.get('responsible_phone', ''),
-            "mantenedor": request.POST.get('maintainer', ''),
+            "email_responsavel": request.POST.get('responsible_mail', '').strip(),
+            "contato_responsavel": request.POST.get('responsible_phone', '').strip(),
+            "mantenedor": request.POST.get('maintainer', '').strip(),
             "requisitos_autenticacao": ", ".join(request.POST.getlist('authentication_requirements[]'))
         }
 
         Sistema.objects.create(**data)
+        messages.success(request, "Sistema registrado com sucesso.")
+        return redirect(reverse('render_project', kwargs={'id': id}))
 
-        return HttpResponseRedirect(reverse('render_lab'))
+    except ValueError as ve:
+        messages.error(request, str(ve))
+    except Exception as e:
+        messages.error(request, f"Ocorreu um erro inesperado ao registrar o sistema: {str(e)}")
 
+    # Recarregar a página com dados em caso de erro
+    project = get_object_or_404(Projeto, pk=id)
+    return render(request, 'registerSystem.html', {
+        'project': project
+    })
+
+@require_http_methods(["POST"])
+def update(request, id):
+    messages.warning(request, "Funcionalidade de atualização ainda não implementada.")
     return HttpResponseRedirect(reverse('render_lab'))
 
 
-@csrf_exempt
-def update(request, id):
-    return "implementar"
+@require_http_methods(["POST"])
+def delete(request, id, idSystem):
+    try:
+        project = get_object_or_404(Projeto, pk=id)
+        system = get_object_or_404(Sistema, id=idSystem, projeto=project)
 
-@csrf_exempt
-def delete(request, id):
-    return "implementar"
+        system.delete()
+        messages.success(request, f"Sistema '{system.nome}' deletado com sucesso.")
+    
+    except Sistema.DoesNotExist:
+        messages.error(request, "O sistema não foi encontrado.")
+    
+    except Projeto.DoesNotExist:
+        messages.error(request, "Projeto não encontrado.")
+    
+    except Exception as e:
+        messages.error(request, f"Ocorreu um erro ao deletar o sistema: {str(e)}")
+
+    return redirect('render_project', id=id)

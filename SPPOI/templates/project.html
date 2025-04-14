@@ -18,7 +18,17 @@
     <!-- Core theme CSS (includes Bootstrap)-->
     <link href="{% static 'bootstrap/css/styles.css'%}" rel="stylesheet" /> 
 </head>
-<body id="page-top">
+<body id="page-top" class="pt-5">
+    {% if messages %}
+    <div class="container pt-5"></div>
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
     <!-- Navigation-->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
         <div class="container px-5">
@@ -40,7 +50,7 @@
         <!-- Título e botão de adicionar -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="fw-bold">Sistemas Registrados</h2>
-            <a class="btn btn-primary rounded-pill px-4" href="{{project.id}}/system/">
+            <a class="btn btn-primary rounded-pill px-4" href="{% url 'render_system' id=project.id %}">
                 <i class="bi bi-plus-circle me-2"></i> Novo Sistema
             </a>
         </div>
@@ -61,9 +71,12 @@
                             <button class="btn btn-outline-primary btn-sm">
                                 <i class="bi bi-eye me-1"></i> Visualizar
                             </button>
-                            <button class="btn btn-outline-secondary btn-sm">
-                                <i class="bi bi-pencil-square me-1"></i> Editar
-                            </button>
+                            <form method="POST" action="{% url 'delete_system' id=project.id idSystem=x.id %}" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja deletar este sistema?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-trash me-1"></i> Deletar
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -76,7 +89,7 @@
         <!-- Título e botão de adicionar -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="fw-bold">Interfaces Registradas</h2>
-            <a class="btn btn-primary rounded-pill px-4" href="{{project.id}}/interface/">
+            <a class="btn btn-primary rounded-pill px-4" href="{% url 'render_interface' id=project.id %}">
                 <i class="bi bi-plus-circle me-2"></i> Nova Interface
             </a>
         </div>
@@ -96,9 +109,12 @@
                             <button class="btn btn-outline-primary btn-sm">
                                 <i class="bi bi-eye me-1"></i> Visualizar
                             </button>
-                            <button class="btn btn-outline-secondary btn-sm">
-                                <i class="bi bi-pencil-square me-1"></i> Editar
-                            </button>
+                            <form method="POST" action="{% url 'delete_interface' id=project.id idInterface=x.id %}" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja deletar esta interface?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-trash me-1"></i> Deletar
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -111,9 +127,9 @@
         <!-- Título e botão de adicionar -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="fw-bold">Estilos de Integração Registrados</h2>
-            <button class="btn btn-primary rounded-pill px-4">
+            <a class="btn btn-primary rounded-pill px-4" href="{{project.id}}/integration/">
                 <i class="bi bi-plus-circle me-2"></i> Novo Estilo
-            </button>
+            </a>
         </div>
     
         <!-- Lista dos Estilos de Integração -->
