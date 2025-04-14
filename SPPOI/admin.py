@@ -1,5 +1,12 @@
 from django.contrib import admin
-from .models import Sistema, Interface, EstiloIntegracao
+from .models import Projeto, Sistema, Interface, EstiloIntegracao
+
+
+@admin.register(Projeto)
+class ProjetoAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'criado_em', 'session_key')
+    search_fields = ('nome', 'criado_em', 'session_key')
+    list_filter = ('nome', 'criado_em', 'session_key')
 
 @admin.register(Sistema)
 class SistemaAdmin(admin.ModelAdmin):

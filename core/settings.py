@@ -31,7 +31,6 @@ STATICFILES_DIRS = [
 
 INSTALLED_APPS = [
     'SPPOI',
-    'django_cron',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -105,7 +104,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 
@@ -124,7 +123,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Usa banco de dados para armazenar sessões
 SESSION_COOKIE_AGE = 24 * 60 * 60  # A sessão vai expirar em 24 horas
-
-CRONJOBS = [
-    ('0 0 * * *', 'app.cron.ClearExpiredDataCronJob'),
-]

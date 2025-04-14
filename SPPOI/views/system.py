@@ -2,15 +2,17 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.utils.timezone import now
 from django.shortcuts import render
-import pytz
-import uuid
 import json
-
-CACHE_TIMEOUT_SECONDS = 60 * 60 * 24  # 24h
-INDEX_KEY = 'temp_index'
+from SPPOI.models import Sistema, Interface, EstiloIntegracao
 
 def render_lab(request):
-    template = render(request, 'system.html')
+    mSistemas = Sistema.objects.all().values()
+
+    context = {
+        'mSistemas': mSistemas
+    }
+
+    template = render(request,'lab.html', context)
     return template
 
 def register(request):
