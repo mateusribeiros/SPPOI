@@ -1,0 +1,168 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Detalhes do projeto</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'bootstrap/assets/favicon.ico'}" />
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Google fonts-->
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,600;1,600&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300;0,500;0,600;0,700;1,300;1,500;1,600;1,700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;1,400&amp;display=swap" rel="stylesheet" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="{% static 'bootstrap/css/styles.css'%}" rel="stylesheet" /> 
+</head>
+<body id="page-top">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
+        <div class="container px-5">
+            <a class="navbar-brand fw-bold" href="{% url 'render_lab' %}">SPPOI</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                Menu
+                <i class="bi-list"></i>
+            </button>
+        </div>
+    </nav>
+    <header class="masthead">
+        <div>
+            <h1>Projeto</h1>
+            <h2>{{project.nome}}</h2>
+        </div>
+    </header>
+
+    <section class="container my-5">
+        <!-- Título e botão de adicionar -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Sistemas Registrados</h2>
+            <a class="btn btn-primary rounded-pill px-4" href="{{project.id}}/system/">
+                <i class="bi bi-plus-circle me-2"></i> Novo Sistema
+            </a>
+        </div>
+    
+        <!-- Lista dos sistemas -->
+        <div class="row g-4">
+            {% for x in mSystems %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title">{{ x.nome }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ x.tipo }}</h6>
+                            <p class="card-text">{{ x.descricao }}</p>
+                            <p class="card-text">{{ x.projeto }}</p>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <button class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-eye me-1"></i> Visualizar
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-pencil-square me-1"></i> Editar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="container my-5">
+        <!-- Título e botão de adicionar -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Interfaces Registradas</h2>
+            <a class="btn btn-primary rounded-pill px-4" href="{{project.id}}/interface/">
+                <i class="bi bi-plus-circle me-2"></i> Nova Interface
+            </a>
+        </div>
+    
+        <!-- Lista das Interfaces -->
+        <div class="row g-4">
+            {% for x in mInterfaces %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title">{{ x.nome }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ x.tipo }}</h6>
+                            <p class="card-text">{{ x.formato_dados}}</p>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <button class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-eye me-1"></i> Visualizar
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-pencil-square me-1"></i> Editar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="container my-5">
+        <!-- Título e botão de adicionar -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Estilos de Integração Registrados</h2>
+            <button class="btn btn-primary rounded-pill px-4">
+                <i class="bi bi-plus-circle me-2"></i> Novo Estilo
+            </button>
+        </div>
+    
+        <!-- Lista dos Estilos de Integração -->
+        <div class="row g-4">
+            {% for x in mIntegrationStyles %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title">{{ x.projeto }}</h5>
+                            <p class="card-text">{{ x.sistema_origem}}</p>
+                            <p class="card-text">{{ x.sistema_destino }}</p>
+                            <p class="card-text">{{ x.estilo }}</p>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <button class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-eye me-1"></i> Visualizar
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-pencil-square me-1"></i> Editar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <footer class="bg-black text-center py-5">
+        <div class="container px-5">
+            <div class="text-white-50 small">
+                <div class="mb-2">&copy; Your Website 2023. All Rights Reserved.</div>
+                <a href="#!">Privacy</a>
+                <span class="mx-1">&middot;</span>
+                <a href="#!">Terms</a>
+                <span class="mx-1">&middot;</span>
+                <a href="#!">FAQ</a>
+            </div>
+        </div>
+    </footer>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="{% static 'bootstrap/js/scripts.js'%}"></script>
+    <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
+    <!-- * *                               SB Forms JS                               * *-->
+    <!-- * * Activate your form at https://startbootstrap.com/solution/contact-forms * *-->
+    <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
+    <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+</body>
+</html>

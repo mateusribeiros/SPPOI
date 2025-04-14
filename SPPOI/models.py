@@ -18,7 +18,9 @@ class Sistema(models.Model):
     funcionalidade_principal = models.TextField(blank=True)
     protocolos_suportados = models.CharField(max_length=100)  # ex: HTTP, HTTPS
     capacidades_dados = models.CharField(max_length=100)  # ex: JSON, XML
-    contato_responsavel = models.CharField(max_length=100)
+    email_responsavel = models.CharField(max_length=100, blank=True)
+    contato_responsavel = models.CharField(max_length=100, blank=True)
+    mantenedor = models.CharField(max_length=100, blank=True)
     requisitos_autenticacao = models.CharField(max_length=50)
 
     def __str__(self):
@@ -27,6 +29,7 @@ class Sistema(models.Model):
 
 class Interface(models.Model):
     sistema = models.ForeignKey(Sistema, on_delete=models.CASCADE, related_name='interfaces')
+    projeto = models.ForeignKey(Projeto, on_delete=models.CASCADE, related_name='interfaces_projeto')
     nome = models.CharField(max_length=100)
     tipo = models.CharField(max_length=50)  # REST API, SOAP, DB, etc
     endpoint = models.TextField()

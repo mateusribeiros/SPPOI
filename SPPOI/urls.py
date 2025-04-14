@@ -1,21 +1,20 @@
 from django.urls import path
-from .views import rootPage, system
+from .views import project, rootPage, system, interface
 
 urlpatterns = [
     path('', rootPage.index, name='index'),
-
-    # Caminhos para registro dos sistemas
-    path('lab/', system.render_lab, name='render_lab'),
-
-    # path('lab/project/', , name='project'),
+    path('lab/', rootPage.render_lab, name='render_lab'),
     
-    path('lab/system/register/', system.register, name='register_system'),
-    path('lab/system/save/', system.save, name='save_system'),
-    path('lab/system/update/', system.update, name='update_system'),
-    path('lab/system/delete/', system.delete, name="delete_system"),
+    path('lab/project/<int:id>', project.render_project, name='render_project'),
+    path('lab/project/register/', project.register_project, name='register_project'),
 
-    # path('lab/interface/register/', , name='register_interface'),
-    # path('lab/interface/register/save/', , name='save_interface'),
+    path('lab/project/<int:id>/system/', system.render_system, name='render_system'),
+    path('lab/project/<int:id>/system/register/', system.register, name='register_system'),
+    # path('lab/project/<int:id>/system/update/', system.update, name='update_system'),
+    # path('lab/project/<int:id>/system/delete/', system.delete, name="delete_system"),
+
+    path('lab/project/<int:id>/interface/', interface.render_interface, name='render_interface'),
+    path('lab/project/<int:id>/interface/register/', interface.register, name='register_interface'),
     # path('lab/interface/update/', , name='update_interface'),
     # path('lab/interface/delete/', , name="delete_interface"),
 

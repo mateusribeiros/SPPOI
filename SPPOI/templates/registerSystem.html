@@ -28,7 +28,7 @@
     <!-- Navigation-->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
         <div class="container px-5">
-            <a class="navbar-brand fw-bold" href="#page-top">SPPOI</a>
+            <a class="navbar-brand fw-bold" href="{% url 'render_lab' %}">SPPOI</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 Menu
                 <i class="bi-list"></i>
@@ -43,8 +43,8 @@
                         <div class="card-body">
                             <h3 class="card-title mb-3 text-center">Registre</h3>
                             <p class="text-center mb-4">Preencha os campos abaixo.</p>
-                            <form class="needs-validation" novalidate>
-    
+                            <form action="register/" class="needs-validation" method="post">
+                            {% csrf_token %}
                                 <div class="col-md-12 mb-3">
                                     <input class="form-control" type="text" name="name" placeholder="Nome do sistema" required>
                                     <div class="invalid-feedback">O campo de nome não deve estar em branco!</div>
@@ -55,7 +55,7 @@
                                 </div>
     
                                 <div class="col-md-12 mb-3">
-                                    <select class="form-select" required>
+                                    <select name="type" class="form-select" required>
                                         <option selected disabled value="">Tipo de sistema</option>
                                         <option value="type_bi">BI - Business Intelligence</option>
                                         <option value="type_crm">CRM - Customer Relationship Management</option>
@@ -64,12 +64,11 @@
                                         <option value="type_scm">SCM - Supply Chain Management</option>
                                         <option value="type_wms">WMS - Warehouse Management System</option>
                                     </select>
-                                    <div class="invalid-feedback">Please select a position!</div>
+                            
                                 </div>
                                 
                                 <div class="col-md-12 mb-3">
                                     <input class="form-control" type="text" name="version" placeholder="Versão" required>
-                                    <div class="invalid-feedback">O campo de nome não deve estar em branco!</div>
                                 </div>
     
                                 <div class="col-md-12 mb-3">
@@ -106,17 +105,14 @@
 
                                     <div class="col-md-12 mb-3">
                                         <input class="form-control" type="email" name="responsible_mail" placeholder="E-mail" required>
-                                        <div class="invalid-feedback">O campo de nome não deve estar em branco!</div>
                                     </div>
 
                                     <div class="col-md-12 mb-3">
                                         <input class="form-control" type="tel" name="responsible_phone" placeholder="Telefone">
-                                        <div class="invalid-feedback">O campo de nome não deve estar em branco!</div>
                                     </div>
 
                                     <div class="col-md-12 mb-3">
                                         <input class="form-control" type="text" name="maintainer" placeholder="Mantenedor do sistema">
-                                        <div class="invalid-feedback">O campo de nome não deve estar em branco!</div>
                                     </div>
                                 </div>
                                 
@@ -131,9 +127,9 @@
                                 </div>
 
                                 <div class="d-grid">
-                                    <button id="submit" type="submit" class="btn btn-primary">Registrar</button>
+                                    <button value="create_system" id="submit" type="submit" class="btn btn-primary" value="register">Registrar</button>
                                 </div>
-    
+                            
                             </form>
                         </div>
                     </div>
