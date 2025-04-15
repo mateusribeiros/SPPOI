@@ -85,3 +85,73 @@ def delete(request, id, idInterface):
         messages.error(request, f"Ocorreu um erro ao deletar a interface: {str(e)}")
 
     return redirect('render_project', id=id)
+
+@require_http_methods(["POST"])
+def update(request, id, idInterface):
+    project = get_object_or_404(Projeto, pk=id)
+    interface = get_object_or_404(Interface, id=idInterface, projeto=project)
+    mSystems = Sistema.objects.filter(projeto=project).values()
+    
+    context = {
+        'project': project,
+        'interface': interface,
+        'mSystems': mSystems
+    }
+
+    return render(request, 'updateInterface.html', context)
+
+@require_http_methods(["POST"])
+def updateData(request, id, idInterface):
+    try:
+        project = get_object_or_404(Projeto, pk=id)
+        updateInterface = get_object_or_404(Interface, id=idInterface, projeto=project)
+
+        updateInterface.projeto = project
+
+        sistema_id = request.POST.get('sistema_id')
+        if not sistema_id:
+            raise ValueError("Sistema não selecionado.")
+
+        sistema = get_object_or_404(Sistema, pk=sistema_id)
+        updateInterface.sistema = sistema
+
+        # Campos
+        updateInterface.nome = request.POST.get("nome", "").strip()
+        updateInterface.tipo = request.POST.get("tipo", "").strip()
+        updateInterface.endpoint=request.POST.get("endpoint", "").strip()
+        updateInterface.formato_dados=request.POST.get("formato_dados", "").strip()
+        updateInterface.metodos_permitidos=request.POST.get("metodos_permitidos", "").strip()
+        updateInterface.esquema=request.POST.get("esquema", "").strip()
+        updateInterface.exemplo_dados=request.POST.get("exemplo_dados", "").strip()
+        updateInterface.operacoes_suportadas=request.POST.get("operacoes_suportadas", "").strip()
+        updateInterface.autenticacao=", ".join(request.POST.getlist("autenticacao[]"))
+        updateInterface.throttling=request.POST.get("throttling", "").strip()
+
+        if not updateInterface.nome or not updateInterface.tipo:
+            raise ValueError("Os campos 'nome' e 'tipo' são obrigatórios.")
+
+        updateInterface.save()
+    
+        messages.success(request, "Interface atualizada com sucesso.")
+        return redirect(reverse('render_project', kwargs={'id': id}))
+
+    except ValueError as ve:
+        messages.error(request, str(ve))
+    except Interface.DoesNotExist:
+        messages.error(request, "A Interface não foi encontrada.")
+    except Projeto.DoesNotExist:
+        messages.error(request, "Projeto não encontrado.")
+    except Exception as e:
+        messages.error(request, f"Ocorreu um erro ao atualizar a Interface: {str(e)}")
+
+    project = get_object_or_404(Projeto, pk=id)
+    interface = get_object_or_404(Interface, id=idInterface, projeto=project)
+    mSystems = Sistema.objects.filter(projeto=project).values()
+    
+    context = {
+        'project': project,
+        'interface': interface,
+        'mSystems': mSystems
+    }
+
+    return render(request, 'updateInterface.html', context)

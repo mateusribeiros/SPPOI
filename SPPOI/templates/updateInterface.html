@@ -1,0 +1,209 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Registro de Interface</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'bootstrap/assets/favicon.ico'}" />
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Google fonts-->
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,600;1,600&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300;0,500;0,600;0,700;1,300;1,500;1,600;1,700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;1,400&amp;display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="{% static 'bootstrap/css/styles.css'%}" rel="stylesheet" /> 
+
+
+<!-- JS + jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+</head>
+<body id="page-top" class="pt-5">
+    {% if messages %}
+    <div class="container mt-4">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
+        <div class="container px-5">
+            <a class="navbar-brand fw-bold" href="{% url 'render_lab' %}">SPPOI</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                Menu
+                <i class="bi-list"></i>
+            </button>
+        </div>
+    </nav>
+    <header class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+        <div class="container w-75">
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <div class="card shadow p-4">
+                        <div class="card-body">
+                            <h3 class="card-title mb-3 text-center">Registre</h3>
+                            <p class="text-center mb-4">Preencha os campos abaixo.</p>
+                            <form action="{% url 'update_interfaceData' id=project.id idInterface=interface.id %}" class="needs-validation" method="post">
+                            {% csrf_token %}
+                                <!-- Seleção do Sistema -->
+                                <div class="col-md-12 mb-3">
+                                    <label for="sistemaSelect" class="form-label">Selecione um Sistema</label>
+                                    <select name="sistema_id" id="sistemaSelect" class="form-select" required>
+                                        <option selected value="{{ interface.sistema.id }}"> {{interface.sistema.nome}}</option>
+                                        {% for sistema in mSystems %}
+                                            {% if sistema.nome != interface.sistema.nome %}
+                                                <option value="{{ sistema.id }}">{{ sistema.nome }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Nome da Interface -->
+                                <div class="col-md-12 mb-3">
+                                    <input class="form-control" type="text" name="nome" value="{{interface.nome}}" placeholder="Nome da Interface" required>
+                                </div>
+
+                                <!-- Tipo da Interface -->
+                                <div class="col-md-12 mb-3">
+                                    <select name="tipo" class="form-select" required>
+                                        <option selected value="{{interface.tipo}}">{{interface.tipo}}</option>
+
+                                        {% if interface.tipo != "REST API" %}
+                                        <option value="REST API">REST API</option>
+                                        {% endif %}
+
+                                        {% if interface.tipo != "SOAP" %}
+                                        <option value="SOAP">SOAP</option>
+                                        {% endif %}
+
+                                        {% if interface.tipo != "DB" %}
+                                        <option value="DB">Conexão com Banco de Dados</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+
+                                <!-- Endpoint -->
+                                <div class="col-md-12 mb-3">
+                                    <input class="form-control" type="text" name="endpoint" value="{{interface.endpoint}}" placeholder="URL do endpoint ou cadeia de conexão" required>
+                                </div>
+
+                                <!-- Formato de Dados -->
+                                <div class="col-md-12 mb-3">
+                                    <select name="formato_dados" class="form-select" required id="formatoDados">
+                                        <option selected value="{{interface.formato_dados}}">{{interface.formato_dados}}</option>
+
+                                        {% if interface.formato_dados != "JSON" %}
+                                        <option value="JSON">JSON</option>
+                                        {% endif %}
+
+                                        {% if interface.formato_dados != "XML" %}
+                                        <option value="XML">XML</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+
+                                <!-- Campos condicionais: aparecem apenas para JSON ou XML -->
+                                <div id="camposJSON_XML" style="display: none;">
+                                    <!-- Métodos Permitidos -->
+                                    <div class="col-md-12 mb-3">
+                                        <input class="form-control" value="{{interface.metodos_permitidos}}" type="text" name="metodos_permitidos" placeholder="Métodos Permitidos (ex: GET, POST, PUT)">
+                                    </div>
+
+                                    <!-- Esquema JSON ou XSD -->
+                                    <div class="col-md-12 mb-3">
+                                        <textarea class="form-control" value="{{interface.esquema}}" name="esquema" placeholder="Esquema JSON ou XSD" rows="5">{{interface.esquema}}</textarea>
+                                    </div>
+
+                                    <!-- Exemplo de Dados -->
+                                    <div class="col-md-12 mb-3">
+                                        <textarea class="form-control" value="{{interface.exemplo_dados}}" name="exemplo_dados" placeholder="Exemplo de Dados (JSON ou XML)" rows="5">{{interface.exemplo_dados}}</textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Operações Suportadas -->
+                                <div class="col-md-12 mb-3">
+                                    <textarea class="form-control" value="{{interface.operacoes_suportadas}}" name="operacoes_suportadas" placeholder="Operações Suportadas (CRUD, buscar por ID, etc.)" rows="3">{{interface.operacoes_suportadas}}</textarea>
+                                </div>
+
+                                <!-- Autenticação -->
+                                <div class="col-md-12 mb-4">
+                                    <label for="autenticacao" class="form-label">Requisitos de Autênticação</label>
+                                    <select class="form-select" id="autenticacao" name="autenticacao[]" multiple required style="width: 100%">
+                                        <option value="oauth" {% if "oauth" in interface.autenticacao %}selected{% endif %}>OAuth</option>
+                                        <option value="basic_auth" {% if "basic_auth" in interface.autenticacao %}selected{% endif %}>Basic Auth</option>
+                                        <option value="api_keys" {% if "api_keys" in interface.autenticacao %}selected{% endif %}>API Keys</option>
+                                        <option value="bearer_token" {% if "bearer_token" in interface.autenticacao %}selected{% endif %}>Bearer Token</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Throttling -->
+                                <div class="col-md-12 mb-3">
+                                    <textarea class="form-control" value="{{interface.throttling}}" name="throttling" placeholder="Limites de Tolerância (Throttling, rate limits, etc.)" rows="3">{{interface.throttling}}</textarea>
+                                </div>
+
+                                <!-- Botão -->
+                                <div class="d-grid mt-4">
+                                    <button type="submit" class="btn btn-primary" value="update">Editar</button>
+                                </div>
+                            
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>    
+    <footer class="bg-black text-center py-5">
+        <div class="container px-5">
+            <div class="text-white-50 small">
+                <div class="mb-2">&copy; Your Website 2023. All Rights Reserved.</div>
+                <a href="#!">Privacy</a>
+                <span class="mx-1">&middot;</span>
+                <a href="#!">Terms</a>
+                <span class="mx-1">&middot;</span>
+                <a href="#!">FAQ</a>
+            </div>
+        </div>
+    </footer>
+    <script src="{% static 'bootstrap/js/registerSystem.js'%}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const formatoSelect = document.getElementById("formatoDados");
+            const camposCondicionais = document.getElementById("camposJSON_XML");
+    
+            function toggleCamposFormato(valor) {
+                if (valor === "JSON" || valor === "XML") {
+                    camposCondicionais.style.display = "block";
+                } else {
+                    camposCondicionais.style.display = "none";
+                }
+            }
+    
+            // Mostrar os campos corretos no carregamento inicial
+            toggleCamposFormato(formatoSelect.value);
+    
+            // Atualizar ao mudar o formato
+            formatoSelect.addEventListener("change", function () {
+                toggleCamposFormato(this.value);
+            });
+    
+            // Ativar select2 para autenticação
+            $('#autenticacao').select2({
+                placeholder: "Selecione os requisitos de autênticação/autorização suportados",
+                dropdownAutoWidth: true,
+                width: 'resolve'
+            });
+        });
+    </script>
+</body>
+</html>
