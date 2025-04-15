@@ -62,7 +62,7 @@ def delete(request, id):
         project = get_object_or_404(Projeto, pk=id)
         project_nome = project.nome  # salva o nome antes de deletar
         project.delete()
-        messages.success(request, f"Projeto '{project_nome}' deletado com sucesso.")
+        messages.success(request, f"Projeto deletado com sucesso.")
 
     except Exception as e:
         messages.error(request, f"Ocorreu um erro ao deletar o projeto: {str(e)}")

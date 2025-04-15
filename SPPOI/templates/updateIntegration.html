@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>Registro dos Estilos de Integração</title>
+    <title>Edição dos Estilos de Integração</title>
     <link rel="icon" type="image/x-icon" href="{% static 'bootstrap/assets/favicon.ico'}" />
     <!-- Bootstrap icons-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
@@ -43,7 +43,7 @@
                         <div class="card-body">
                             <h3 class="card-title mb-3 text-center">Registre</h3>
                             <p class="text-center mb-4">Preencha os campos abaixo.</p>
-                            <form action="{% url 'register_integration' id=project.id %}" class="needs-validation" method="post">
+                            <form action="{% url 'update_integrationData' id=project.id idIntegration=integration.id %}" class="needs-validation" method="post">
                                 {% csrf_token %}
 
                                 {% if messages %}
@@ -61,19 +61,23 @@
                                 <div class="mb-3">
                                     <label class="form-label">Sistema de Origem</label>
                                     <select name="sistema_origem_id" class="form-select" required>
-                                        <option selected disabled value="">Selecione o sistema de origem</option>
+                                        <option selected value="{{ integration.sistema_origem.id }}">{{ integration.sistema_origem.nome }}</option>
                                         {% for sistema in mSystems %}
-                                            <option value="{{ sistema.id }}">{{ sistema.nome }}</option>
+                                            {% if sistema.nome != integration.sistema_origem.nome %}
+                                                <option value="{{ sistema.id }}">{{ sistema.nome }}</option>
+                                            {% endif %}
                                         {% endfor %}
                                     </select>
-                                </div>
+                                </div>                                
                             
                                 <div class="mb-3">
                                     <label class="form-label">Sistema de Destino</label>
                                     <select name="sistema_destino_id" class="form-select" required>
-                                        <option selected disabled value="">Selecione o sistema de destino</option>
+                                        <option selected value="{{ integration.sistema_destino.id }}">{{ integration.sistema_destino.nome}}</option>
                                         {% for sistema in mSystems %}
-                                            <option value="{{ sistema.id }}">{{ sistema.nome }}</option>
+                                            {% if sistema.id != integration.sistema_destino.id %}
+                                                <option value="{{ sistema.id }}">{{ sistema.nome }}</option>
+                                            {% endif %}
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -82,77 +86,108 @@
                                 <div class="mb-3">
                                     <label class="form-label">Estilo de Integração</label>
                                     <select name="estilo" id="estiloSelect" class="form-select" required>
-                                        <option selected disabled value="">Selecione o estilo</option>
-                                        <option value="Banco Compartilhado">Compartilhamento de Banco de Dados</option>
-                                        <option value="Mensageria">Mensageria</option>
-                                        <option value="RPC">RPC (Chamada de Procedimento Remoto)</option>
-                                        <option value="Troca de Arquivos">Troca de Arquivos</option>
+                                        <option selected value="{{ integration.estilo }}">{{ integration.estilo }}</option>
+                                
+                                        {% if integration.estilo != "Banco Compartilhado" %}
+                                            <option value="Banco Compartilhado">Compartilhamento de Banco de Dados</option>
+                                        {% endif %}
+                                        {% if integration.estilo != "Mensageria" %}
+                                            <option value="Mensageria">Mensageria</option>
+                                        {% endif %}
+                                        {% if integration.estilo != "RPC" %}
+                                            <option value="RPC">RPC (Chamada de Procedimento Remoto)</option>
+                                        {% endif %}
+                                        {% if integration.estilo != "Arquivo" %}
+                                            <option value="Troca de Arquivos">Troca de Arquivos</option>
+                                        {% endif %}
                                     </select>
                                 </div>
                             
                                 <!-- Campos Condicionais -->
                                 <div id="camposBanco" style="display: none;">
                                     <h5>Banco de Dados</h5>
-                                    <input type="text" name="tipo_banco" class="form-control mb-2" placeholder="Tipo de Banco (SQL, NoSQL)">
-                                    <input type="text" name="host" class="form-control mb-2" placeholder="Host">
-                                    <input type="text" name="porta" class="form-control mb-2" placeholder="Porta">
-                                    <input type="text" name="nome_banco" class="form-control mb-2" placeholder="Nome do Banco">
-                                    <input type="text" name="usuario" class="form-control mb-2" placeholder="Usuário">
-                                    <input type="password" name="senha" class="form-control mb-2" placeholder="Senha">
-                                    <textarea name="tabelas_compartilhadas" class="form-control mb-2" rows="2" placeholder="Tabelas/Visões compartilhadas"></textarea>
+                                    
+                                    <input type="text" name="tipo_banco" class="form-control mb-2" 
+                                           value="{{ integration.detalhes.tipo_banco }}" 
+                                           placeholder="Tipo de Banco (SQL, NoSQL)">
+                                    
+                                    <input type="text" name="host" class="form-control mb-2" 
+                                           value="{{ integration.detalhes.host }}" 
+                                           placeholder="Host">
+                                    
+                                    <input type="text" name="porta" class="form-control mb-2" 
+                                           value="{{ integration.detalhes.porta }}" 
+                                           placeholder="Porta">
+                                    
+                                    <input type="text" name="nome_banco" class="form-control mb-2" 
+                                           value="{{ integration.detalhes.nome_banco }}" 
+                                           placeholder="Nome do Banco">
+                                    
+                                    <input type="text" name="usuario" class="form-control mb-2" 
+                                           value="{{ integration.detalhes.usuario }}" 
+                                           placeholder="Usuário">
+                                    
+                                    <input type="password" name="senha" class="form-control mb-2" 
+                                           value="{{ integration.detalhes.senha }}" 
+                                           placeholder="Senha">
+                                    
+                                    <textarea name="tabelas_compartilhadas" class="form-control mb-2" rows="2" 
+                                              placeholder="Tabelas/Visões compartilhadas">{{ integration.detalhes.tabelas_compartilhadas }}</textarea>
+                                    
                                     <select name="sincronizacao" class="form-select mb-2">
-                                        <option selected disabled value="">Agendamento de Sincronização</option>
-                                        <option value="Tempo real">Tempo real</option>
-                                        <option value="Processamento em lote">Processamento em lote</option>
+                                        <option disabled value="">Agendamento de Sincronização</option>
+                                        <option value="Tempo real" {% if integration.detalhes.sincronizacao == "Tempo real" %}selected{% endif %}>Tempo real</option>
+                                        <option value="Processamento em lote" {% if integration.detalhes.sincronizacao == "Processamento em lote" %}selected{% endif %}>Processamento em lote</option>
                                     </select>
                                 </div>
                             
                                 <div id="camposMensageria" style="display: none;">
                                     <h5>Mensageria</h5>
-                                    <input type="text" name="broker" class="form-control mb-2" placeholder="Broker (ex: Kafka, RabbitMQ)">
-                                    <input type="text" name="topicos_filas" class="form-control mb-2" placeholder="Tópicos ou Filas">
+                                    <input type="text" name="broker" class="form-control mb-2" value="{{ integration.detalhes.broker }}" placeholder="Broker (ex: Kafka, RabbitMQ)">
+                                    <input type="text" name="topicos_filas" class="form-control mb-2" value="{{ integration.detalhes.topicos_filas }}" placeholder="Tópicos ou Filas">
                                     <div class="mb-2">
-                                        <select id="formato_mensagem" name="formato_mensagem" class="form-select" multiple style="width: 100%">
-                                            <option value="JSON">JSON</option>
-                                            <option value="XML">XML</option>
-                                            <option value="Protobuf">Protocol Buffers</option>
+                                        <select id="formato_dados" name="formato_dados" class="form-select" multiple style="width: 100%">
+                                            <option value="JSON" {% if "JSON" in integration.detalhes.formato_dados %}selected{% endif %}>JSON</option>
+                                            <option value="XML" {% if "XML" in integration.detalhes.formato_dados %}selected{% endif %}>XML</option>
+                                            <option value="Protobuf" {% if "Protobuf" in integration.detalhes.formato_dados %}selected{% endif %}>Protocol Buffers</option>
                                         </select>
                                     </div>
                                 </div>
+                                
                             
                                 <div id="camposRPC" style="display: none;">
                                     <h5>RPC</h5>
                                     <select name="tipo_rpc" class="form-select mb-2">
-                                        <option selected disabled value="">Tipo de RPC</option>
-                                        <option value="Síncrono">Síncrono</option>
-                                        <option value="Assíncrono">Assíncrono</option>
+                                        <option disabled value="">Tipo de RPC</option>
+                                        <option value="Síncrono" {% if integration.detalhes.tipo_rpc == "Síncrono" %}selected{% endif %}>Síncrono</option>
+                                        <option value="Assíncrono" {% if integration.detalhes.tipo_rpc == "Assíncrono" %}selected{% endif %}>Assíncrono</option>
                                     </select>
-                                    <textarea name="definicoes_metodos" class="form-control mb-2" placeholder="Definições de métodos (nomes, parâmetros)" rows="3"></textarea>
-                                    <input type="text" name="endpoint_rpc" class="form-control mb-2" placeholder="Endpoint RPC">
-                                </div>
+                                    <textarea name="definicoes_metodos" class="form-control mb-2" placeholder="Definições de métodos (nomes, parâmetros)" rows="3">{{ integration.detalhes.metodos }}</textarea>
+                                    <input type="text" name="endpoint_rpc" class="form-control mb-2" value="{{ integration.detalhes.endpoint_rpc }}" placeholder="Endpoint RPC">
+                                </div>                                
                             
                                 <div id="camposArquivo" style="display: none;">
                                     <h5>Troca de Arquivos</h5>
                                     <div class="mb-2">
                                         <select id="tipo_arquivo" name="tipo_arquivo" class="form-select" multiple style="width: 100%">
-                                            <option value="CSV">CSV</option>
-                                            <option value="JSON">JSON</option>DDC 
-                                            <option value="XML">XML</option>
+                                            <option value="CSV" {% if "CSV" in integration.detalhes.tipo_arquivo %}selected{% endif %}>CSV</option>
+                                            <option value="JSON" {% if "JSON" in integration.detalhes.tipo_arquivo %}selected{% endif %}>JSON</option>
+                                            <option value="XML" {% if "XML" in integration.detalhes.tipo_arquivo %}selected{% endif %}>XML</option>
                                         </select>
                                     </div>
                                     <div class="mb-2">
                                         <select id="protocolo_transferencia" name="protocolo_transferencia" class="form-select" multiple style="width: 100%">
-                                            <option value="FTP">FTP</option>
-                                            <option value="SFTP">SFTP</option>
-                                            <option value="HTTP">HTTP</option>
+                                            <option value="FTP" {% if "FTP" in integration.detalhes.protocolo_transferencia %}selected{% endif %}>FTP</option>
+                                            <option value="SFTP" {% if "SFTP" in integration.detalhes.protocolo_transferencia %}selected{% endif %}>SFTP</option>
+                                            <option value="HTTP" {% if "HTTP" in integration.detalhes.protocolo_transferencia %}selected{% endif %}>HTTP</option>
                                         </select>
                                     </div>
-                                    <input type="text" name="local_armazenamento" class="form-control mb-2" placeholder="Local de Armazenamento (diretório ou bucket)">
-                                    <input type="text" name="transformacao_arquivo" class="form-control mb-2" placeholder="Transformação de Arquivo (ex: JSON para CSV)">
-                                </div>
+                                    <input type="text" name="local_armazenamento" class="form-control mb-2" value="{{ integration.detalhes.local_armazenamento }}" placeholder="Local de Armazenamento (diretório ou bucket)">
+                                    <input type="text" name="transformacao_arquivo" class="form-control mb-2" value="{{ integration.detalhes.transformacao_arquivo }}" placeholder="Transformação de Arquivo (ex: JSON para CSV)">
+                                </div>                                
                             
                                 <div class="d-grid mt-4">
-                                    <button type="submit" class="btn btn-primary" value="register">Registrar Estilo de Integração</button>
+                                    <button type="submit" class="btn btn-primary" value="update">EDITAR</button>
                                 </div>
                             </form>
                         </div>
@@ -209,23 +244,31 @@
             });
         }
         });
+        document.addEventListener("DOMContentLoaded", function () {
+            const estiloSelect = document.getElementById("estiloSelect");
+            const campos = {
+                "Banco Compartilhado": "camposBanco",
+                "Mensageria": "camposMensageria",
+                "RPC": "camposRPC",
+                "Troca de Arquivos": "camposArquivo"
+            };
 
-        document.getElementById("estiloSelect").addEventListener("change", function () {
-        const valor = this.value;
-        const campos = {
-            "Banco Compartilhado": "camposBanco",
-            "Mensageria": "camposMensageria",
-            "RPC": "camposRPC",
-            "Troca de Arquivos": "camposArquivo"
-        };
+            function toggleCampos(valor) {
+                for (const key in campos) {
+                    document.getElementById(campos[key]).style.display = "none";
+                }
+                if (campos[valor]) {
+                    document.getElementById(campos[valor]).style.display = "block";
+                }
+            }
 
-        for (const key in campos) {
-            document.getElementById(campos[key]).style.display = "none";
-        }
+            // Mostrar os campos corretos no carregamento inicial
+            toggleCampos(estiloSelect.value);
 
-        if (campos[valor]) {
-            document.getElementById(campos[valor]).style.display = "block";
-        }
+            // Atualizar ao mudar o estilo
+            estiloSelect.addEventListener("change", function () {
+                toggleCampos(this.value);
+            });
         });
 
         $(document).ready(function () {
@@ -239,7 +282,7 @@
                 dropdownAutoWidth: true,
                 width: 'resolve'
             });
-            $('#formato_mensagem').select2({
+            $('#formato_dados').select2({
                 placeholder: "Selecione os formatos de dados",
                 dropdownAutoWidth: true,
                 width: 'resolve'

@@ -73,7 +73,7 @@ def delete(request, id, idInterface):
         interface = get_object_or_404(Interface, id=idInterface, projeto=project)
         interface.delete()
 
-        messages.success(request, f"Interface '{interface.nome}' deletada com sucesso.")
+        messages.success(request, f"Interface deletada com sucesso.")
     
     except Interface.DoesNotExist:
         messages.error(request, "A interface não foi encontrada.")

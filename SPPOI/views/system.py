@@ -73,7 +73,7 @@ def delete(request, id, idSystem):
         system = get_object_or_404(Sistema, id=idSystem, projeto=project)
 
         system.delete()
-        messages.success(request, f"Sistema '{system.nome}' deletado com sucesso.")
+        messages.success(request, f"Sistema deletado com sucesso.")
     
     except Sistema.DoesNotExist:
         messages.error(request, "O sistema não foi encontrado.")

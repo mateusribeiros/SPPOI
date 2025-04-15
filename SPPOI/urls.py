@@ -26,6 +26,9 @@ urlpatterns = [
     # Estilo de Integração
     path('lab/project/<int:id>/integration/', integration.render_integration, name='render_integration'),
     path('lab/project/<int:id>/integration/register/', integration.register, name='register_integration'),
+    path('lab/project/<int:id>/integration/delete/<int:idIntegration>/', integration.delete, name='delete_integration'),
+    path('lab/project/<int:id>/integration/update/<int:idIntegration>/', integration.update, name='update_integration'),
+    path('lab/project/<int:id>/integration/updateData/<int:idIntegration>/', integration.updateData, name='update_integrationData'),
 
     # Futuras rotas para salvar dados temporários
     # path('store/', rootPage.render_save_page, name='render_save_page'),
