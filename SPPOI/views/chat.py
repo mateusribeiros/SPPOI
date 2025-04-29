@@ -9,24 +9,29 @@ import os
 import requests
 from django.conf import settings
 
-@require_http_methods(["GET"])
+@require_http_methods(["GET", "POST"])
 def render_chat(request, id):
     try:
-        # Buscar os dados do projeto
+        # Buscar os dados do projeto e relacionados
         project, mSystems, mInterfaces, mIntegrationStyles = get_project_data(id)
 
-        # Criar o prompt para a IA
-        prompt = create_prompt(project, mSystems, mInterfaces, mIntegrationStyles)
+        # Inicializa valores padrão
+        prompt = None
+        ai_response = None
 
-        # Obter a resposta da IA
-        ai_response = get_ai_response(prompt)
+        # Se for POST, significa que o usuário clicou para consultar a IA
+        if request.method == "POST":
+            # Criar prompt
+            prompt = create_prompt(project, mSystems, mInterfaces, mIntegrationStyles)
+            # Obter resposta da IA
+            ai_response = get_ai_response(prompt)
 
-        # Contexto para o template
         context = {
             'project': project,
             'mSystems': mSystems,
             'mInterfaces': mInterfaces,
             'mIntegrationStyles': mIntegrationStyles,
+            'prompt': prompt,
             'ai_response': ai_response,
         }
 
@@ -35,55 +40,63 @@ def render_chat(request, id):
     except Exception as e:
         messages.error(request, f"Erro ao carregar o projeto: {str(e)}")
         return HttpResponseRedirect(reverse('render_project', kwargs={'id': id}))
+
     
-
-# Implementação da IA generativa
 def create_prompt(project, mSystems, mInterfaces, mIntegrationStyles):
-    prompt = f"""You are a top-tier AI expert specialized in project analysis and improvement. Follow the instructions precisely.
+    prompt = f"""Você é uma IA especialista de alto nível em integração de sistemas, arquitetura de software e interoperabilidade. Seu objetivo é analisar ambientes de sistemas com foco em **melhorias, boas práticas e pontos críticos de atenção**, com base nos dados fornecidos.
 
-### Context
-Project:
-- Name: {project.nome}
-Systems:
-"""
+    ### Contexto do Projeto
+    Projeto:
+    - Nome: {project.nome}
+
+    Sistemas:
+    """
     for system in mSystems:
         prompt += (
-            f"- {system['nome']} (Type: {system['tipo']}, Version: {system['versao']}, "
-            f"Main Function: {system['funcionalidade_principal']}, Protocols: {system['protocolos_suportados']}, "
-            f"Data Capabilities: {system['capacidades_dados']}, Maintainer: {system['mantenedor']}, "
-            f"Auth Requirements: {system['requisitos_autenticacao']})\n"
+            f"- {system['nome']} (Tipo: {system['tipo']}, Versão: {system['versao']}, "
+            f"Função Principal: {system['funcionalidade_principal']}, Protocolos Suportados: {system['protocolos_suportados']}, "
+            f"Capacidades de Dados: {system['capacidades_dados']}, Mantenedor: {system['mantenedor']}, "
+            f"Autenticação: {system['requisitos_autenticacao']})\n"
         )
 
     prompt += "\nInterfaces:\n"
     for interface in mInterfaces:
         prompt += (
-            f"- {interface['nome']} (Type: {interface['tipo']}, Endpoint: {interface['endpoint']}, "
-            f"Data Format: {interface['formato_dados']}, Methods: {interface['metodos_permitidos']}, "
-            f"Authentication: {interface['autenticacao']}, Operations: {interface['operacoes_suportadas']})\n"
+            f"- {interface['nome']} (Tipo: {interface['tipo']}, Endpoint: {interface['endpoint']}, "
+            f"Formato de Dados: {interface['formato_dados']}, Métodos Permitidos: {interface['metodos_permitidos']}, "
+            f"Autenticação: {interface['autenticacao']}, Operações Suportadas: {interface['operacoes_suportadas']})\n"
         )
 
-    prompt += "\nIntegration Styles:\n"
+    prompt += "\nEstilos de Integração:\n"
     for style in mIntegrationStyles:
         prompt += (
-            f"- {style.estilo} (From: {style.sistema_origem.nome} → To: {style.sistema_destino.nome}, "
-            f"Details: {style.detalhes})\n"
+            f"- {style.estilo} (De: {style.sistema_origem.nome} → Para: {style.sistema_destino.nome}, "
+            f"Detalhes: {style.detalhes})\n"
         )
 
     prompt += """
 
-    ### Tasks
-    1. Extract system, interface, and integration names into a **comma-separated list**. No extra text.
-    2. Analyze the project based on industry best practices.
-    3. Suggest **specific**, **concise**, and **actionable** improvements for:
-    - Systems (architecture, security, maintainability)
-    - Interfaces (design, robustness, scalability)
-    - Integration styles (efficiency, decoupling, modernization)
-    4. Write in clear English. No greetings, no disclaimers, no self-references.
+    ### Tarefas
+    1. Analise criticamente o ambiente apresentado com base em boas práticas reconhecidas da indústria (ex: desacoplamento, padronização, segurança, escalabilidade).
+    2. Sugira melhorias **específicas**, **concretas** e **executáveis** nos seguintes aspectos:
+    - Sistemas: arquitetura, segurança, capacidade de manutenção, uso de protocolos e dados.
+    - Interfaces: padronização, resiliência, versionamento, documentação, escalabilidade.
+    - Estilos de Integração: eficiência, sincronismo, acoplamento, modernização, event-driven, API-first.
+    3. Aponte riscos ou fragilidades que podem comprometer a interoperabilidade ou escalabilidade futura.
+    4. Forneça dicas práticas ou padrões arquiteturais que poderiam ser adotados para melhorar a integração.
 
-    Respond in the following structure:
-    - Extracted Names: [list]
-    - Improvements: [bullet points]
-
+    ### Requisitos de Resposta
+    - Escreva em **português brasileiro**, de forma clara, técnica e objetiva.
+    - Não inclua saudações, desculpas ou referências a você mesmo.
+    - Não faça suposições sobre o que o usuário já sabe ou não. Foque na clareza e na precisão técnica.
+    - Apresente uma análise detalhada, porém gerencie de maneira econômica o espaço de resposta.
+    - Gerencie a resposta para possuir no máximo 2000 tokens, sem encerrar a resposta abruptamente e contendo uma conclusão clara.
+    - Evite repetições e redundâncias. Cada frase deve agregar valor à análise.
+    - Finalize a resposta após a conclusão. **Não repita, não reinicie, nem ultrapasse os 2000 tokens.**
+    - Lembre-se que o seu público são **desenvolvedores e arquitetos de software**.
+    - Estruture a resposta assim:
+    - **Nomes Extraídos**: [lista separada por vírgulas]
+    - **Análise e Melhorias**: [tópicos com bullet points]
     """
 
     return prompt
@@ -112,7 +125,7 @@ def get_ai_response(prompt):
             {"role": "user", "content": prompt}
         ],
         "model": model_id,
-        "max_tokens": 512,
+        "max_tokens": 2000,
     }
 
 
@@ -128,14 +141,7 @@ def get_ai_response(prompt):
 
     generated_text = result["choices"][0]["message"]["content"]
 
-    full_response = f"""=== Prompt ===
-    {prompt}
-    
-    \n \n
-    === AI Response ===
-    {generated_text}
-    """
-    return full_response
+    return generated_text
 
 def get_project_data(project_id):
     # Busca o projeto e seus dados internos 

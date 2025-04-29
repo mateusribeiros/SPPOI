@@ -46,11 +46,17 @@
         </div>
     </nav>
     <header class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+        
         <div class="container w-75">
             <div class="row justify-content-center">
                 <div class="col-12">
                     <div class="card shadow p-4">
                         <div class="card-body">
+                            <div class="container">
+                                <button class="btn btn-primary btn-voltar" onclick="window.history.back()">
+                                  <i class="bi bi-arrow-left"></i> Voltar
+                                </button>
+                            </div>
                             <h3 class="card-title mb-3 text-center">Registre</h3>
                             <p class="text-center mb-4">Preencha os campos abaixo.</p>
                             <form action="{% url 'register_system' id=project.id %}" class="needs-validation" method="post">

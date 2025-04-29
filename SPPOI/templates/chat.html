@@ -42,12 +42,18 @@
     </nav>
     {% block content %}
         <div class="container my-5">
+            <div class="container">
+                <button class="btn btn-primary btn-voltar" onclick="window.history.back()">
+                  <i class="bi bi-arrow-left"></i> Voltar
+                </button>
+            </div>
+            
             <div class="card shadow">
                 <div class="card-body">
                     <h1 class="card-title">{{ project.nome }}</h1>
                 </div>
             </div>
-
+            
             <div class="row mt-4">
                 <!-- Systems -->
                 <div class="col-md-4">
@@ -73,7 +79,7 @@
                         </div>
                         <ul class="list-group list-group-flush">
                             {% for interface in mInterfaces %}
-                                <li class="list-group-item">{{ interface.nome }} - {{ interface.descricao }}</li>
+                                <li class="list-group-item">{{ interface.nome }}</li>
                             {% empty %}
                                 <li class="list-group-item text-muted">No interfaces available.</li>
                             {% endfor %}
@@ -89,7 +95,7 @@
                         </div>
                         <ul class="list-group list-group-flush">
                             {% for style in mIntegrationStyles %}
-                                <li class="list-group-item">{{ style.nome }} - {{ style.descricao }}</li>
+                                <li class="list-group-item">{{ style.estilo }} - {{ style.sistema_origem.nome }} > {{style.sistema_destino.nome}}</li>
                             {% empty %}
                                 <li class="list-group-item text-muted">No integration styles available.</li>
                             {% endfor %}
@@ -99,8 +105,44 @@
             </div>
         </div>
         
-        <h2>IA Response</h2>
-        <p>{{ ai_response }}</p>
+        <form method="post" action="{% url 'render_chat' id=project.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-send-fill me-1"></i> Consultar IA
+            </button>
+        </form>
+        
+        {% if prompt and ai_response %}
+            <div class="container my-5">
+                <div class="row">
+                    <!-- Prompt -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card shadow border-start border-primary border-4 h-100">
+                            <div class="card-header bg-primary text-white fw-bold">
+                                Prompt Gerado
+                            </div>
+                            <div class="card-body bg-light">
+                                <pre class="mb-0" style="white-space: pre-wrap; word-break: break-word;">{{ prompt }}</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resposta da IA -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card shadow border-start border-success border-4 h-100">
+                            <div class="card-header bg-success text-white fw-bold">
+                                Resposta da IA
+                            </div>
+                            <div class="card-body bg-light">
+                                <pre class="mb-0" style="white-space: pre-wrap; word-break: break-word;">{{ ai_response }}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        
 
 
     <script src="{% static 'js/chat.js' %}"></script>
