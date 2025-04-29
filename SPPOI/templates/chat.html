@@ -1,0 +1,109 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>{{ project.nome}}</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'bootstrap/assets/favicon.ico'}" />
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Google fonts-->
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,600;1,600&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300;0,500;0,600;0,700;1,300;1,500;1,600;1,700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;1,400&amp;display=swap" rel="stylesheet" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="{% static 'bootstrap/css/styles.css'%}" rel="stylesheet" /> 
+</head>
+<body id="page-top" class="pt-5">
+    {% if messages %}
+    <div class="container mt-4">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
+        <div class="container px-5">
+            <a class="navbar-brand fw-bold" href="{% url 'render_lab' %}">SPPOI</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                Menu
+                <i class="bi-list"></i>
+            </button>
+        </div>
+    </nav>
+    {% block content %}
+        <div class="container my-5">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h1 class="card-title">{{ project.nome }}</h1>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <!-- Systems -->
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            Systems
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            {% for system in mSystems %}
+                                <li class="list-group-item">{{ system.nome }} - {{ system.descricao }}</li>
+                            {% empty %}
+                                <li class="list-group-item text-muted">No systems available.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Interfaces -->
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-success text-white">
+                            Interfaces
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            {% for interface in mInterfaces %}
+                                <li class="list-group-item">{{ interface.nome }} - {{ interface.descricao }}</li>
+                            {% empty %}
+                                <li class="list-group-item text-muted">No interfaces available.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Integration Styles -->
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-info text-white">
+                            Integration Styles
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            {% for style in mIntegrationStyles %}
+                                <li class="list-group-item">{{ style.nome }} - {{ style.descricao }}</li>
+                            {% empty %}
+                                <li class="list-group-item text-muted">No integration styles available.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <h2>IA Response</h2>
+        <p>{{ ai_response }}</p>
+
+
+    <script src="{% static 'js/chat.js' %}"></script>
+    {% endblock %}
+</body>
+</html>

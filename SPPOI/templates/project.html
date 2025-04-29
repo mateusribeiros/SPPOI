@@ -37,6 +37,12 @@
                 Menu
                 <i class="bi-list"></i>
             </button>
+            <a href="{% url 'render_chat' id=project.id %}" class="btn btn-primary rounded-pill px-3 mb-2 mb-lg-0">
+                <span class="d-flex align-items-center">
+                    <i class="bi-chat-text-fill me-2"></i>
+                    <span class="small">Obter melhorias</span>
+                </span>
+            </a>  
         </div>
     </nav>
     <header class="masthead">
@@ -68,9 +74,12 @@
                             <p class="card-text">{{ x.projeto }}</p>
                         </div>
                         <div class="d-flex justify-content-between align-items-center mt-3">
-                            <button class="btn btn-outline-primary btn-sm">
-                                <i class="bi bi-eye me-1"></i> Visualizar
-                            </button>
+                            <form method="POST" action="{% url 'update_system' id=project.id idSystem=x.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-eye me-1"></i> Visualizar
+                                </button>
+                            </form>
                             <form method="POST" action="{% url 'delete_system' id=project.id idSystem=x.id %}" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja deletar este sistema?');">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-outline-danger btn-sm">
@@ -171,12 +180,10 @@
     <footer class="bg-black text-center py-5">
         <div class="container px-5">
             <div class="text-white-50 small">
-                <div class="mb-2">&copy; Your Website 2023. All Rights Reserved.</div>
-                <a href="#!">Privacy</a>
+                <div class="mb-2">&copy; UFG - SPPOI 2025. Todos os direitos reservados.</div>
+                <a href="#!">Privacidade</a>
                 <span class="mx-1">&middot;</span>
-                <a href="#!">Terms</a>
-                <span class="mx-1">&middot;</span>
-                <a href="#!">FAQ</a>
+                <a href="#!">Termos</a>
             </div>
         </div>
     </footer>

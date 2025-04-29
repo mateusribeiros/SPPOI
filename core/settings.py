@@ -102,13 +102,16 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'pt-br'
 
 TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 
 USE_TZ = True
+
+USE_L10N = True
+
 
 
 # Static files (CSS, JavaScript, Images)
@@ -123,3 +126,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Usa banco de dados para armazenar sessões
 SESSION_COOKIE_AGE = 24 * 60 * 60  # A sessão vai expirar em 24 horas
+
+HF_API_TOKEN= config('HF_API_TOKEN')
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False

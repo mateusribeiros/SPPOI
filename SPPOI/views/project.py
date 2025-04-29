@@ -38,7 +38,7 @@ def render_project(request, id):
 def register_project(request):
     try:
         session_key = create_session(request)
-        project_name = request.POST.get("project_name", "").strip()
+        project_name = request.POST.get("project_name", "")
 
         if not project_name:
             messages.error(request, "O nome do projeto é obrigatório.")
@@ -60,7 +60,6 @@ def register_project(request):
 def delete(request, id):
     try:
         project = get_object_or_404(Projeto, pk=id)
-        project_nome = project.nome  # salva o nome antes de deletar
         project.delete()
         messages.success(request, f"Projeto deletado com sucesso.")
 
@@ -68,3 +67,23 @@ def delete(request, id):
         messages.error(request, f"Ocorreu um erro ao deletar o projeto: {str(e)}")
 
     return redirect('render_lab')
+
+@require_http_methods(["POST"])
+def update(request, id):
+    try:
+        project = get_object_or_404(Projeto, pk=id)
+        new_name = request.POST.get("project_name", "").strip()
+
+        if not new_name:
+            messages.error(request, "O nome do projeto é obrigatório.")
+            return HttpResponseRedirect(reverse('render_lab'))
+
+        project.nome = new_name
+        project.save()
+
+        messages.success(request, "Projeto atualizado com sucesso!")
+        return HttpResponseRedirect(reverse('render_lab'))
+
+    except Exception as e:
+        messages.error(request, f"Erro ao atualizar projeto: {str(e)}")
+        return HttpResponseRedirect(reverse('render_lab'))

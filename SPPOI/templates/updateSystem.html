@@ -53,91 +53,109 @@
                         <div class="card-body">
                             <h3 class="card-title mb-3 text-center">Registre</h3>
                             <p class="text-center mb-4">Preencha os campos abaixo.</p>
-                            <form action="{% url 'register_system' id=project.id %}" class="needs-validation" method="post">
+                            <form action="{% url 'update_systemData' id=project.id idSystem=system.id%}" class="needs-validation" method="post">
                             {% csrf_token %}
+
                                 <div class="col-md-12 mb-3">
-                                    <input class="form-control" type="text" name="name" placeholder="Nome do sistema" required>
-                                    <div class="invalid-feedback">O campo de nome não deve estar em branco!</div>
+                                    <input class="form-control" type="text" value="{{system.nome}}" name="name" placeholder="Nome do sistema" required>
                                 </div>
     
                                 <div class="col-md-12 mb-3">
-                                    <textarea class="form-control" name="description" placeholder="Descrição" rows="4" cols="50"></textarea>
+                                    <textarea class="form-control" name="description" value="{{system.descricao}}" placeholder="Descrição" rows="4" cols="50">{{system.descricao}}</textarea>
                                 </div>
     
                                 <div class="col-md-12 mb-3">
                                     <select name="type" class="form-select" required>
-                                        <option selected disabled value="">Tipo de sistema</option>
+                                        <option selected value="{{system.tipo}}">{{system.tipo}}</option>
+
+                                        {% if system.tipo != "BI - Business Intelligence" %}
                                         <option value="BI - Business Intelligence">BI - Business Intelligence</option>
+                                        {% endif %}
+
+                                        {% if system.tipo != "CRM - Customer Relationship Management" %}
                                         <option value="CRM - Customer Relationship Management">CRM - Customer Relationship Management</option>
+                                        {% endif %}
+
+                                        {% if system.tipo != "ERP - Enterprise Resource Planning" %}
                                         <option value="ERP - Enterprise Resource Planning">ERP - Enterprise Resource Planning</option>
+                                        {% endif %}
+
+                                        {% if system.tipo != "Gateway de pagamentos" %}
                                         <option value="Gateway de pagamentos">Gateway de pagamentos</option>
+                                        {% endif %}
+
+                                        {% if system.tipo != "SCM - Supply Chain Management" %}
                                         <option value="SCM - Supply Chain Management">SCM - Supply Chain Management</option>
+                                        {% endif %}
+
+                                        {% if system.tipo != "WMS - Warehouse Management System" %}
                                         <option value="WMS - Warehouse Management System">WMS - Warehouse Management System</option>
+                                        {% endif %}
                                     </select>
                             
                                 </div>
                                 
                                 <div class="col-md-12 mb-3">
-                                    <input class="form-control" type="text" name="version" placeholder="Versão" required>
+                                    <input class="form-control" type="text" value="{{system.versao}}" name="version" placeholder="Versão" required>
                                 </div>
     
                                 <div class="col-md-12 mb-3">
-                                    <textarea class="form-control" name="main_funcionality" placeholder="Funcionalidade principal" rows="4" cols="50"></textarea>
+                                    <textarea class="form-control" value="{{system.funcionalidade_principal}}" name="main_funcionality" placeholder="Funcionalidade principal" rows="4" cols="50">{{system.funcionalidade_principal}}</textarea>
                                 </div>
     
                                 <div class="col-md-12 mb-3">
                                     <label for="protocolosSuportados" class="form-label">Protocolos Suportados</label>
                                     <select class="form-select" id="protocolosSuportados" name="protocolos[]" multiple required style="width: 100%">
-                                        <option value="http">HTTP</option>
-                                        <option value="https">HTTPS</option>
-                                        <option value="soap">SOAP (via HTTP)</option>
-                                        <option value="amqp">AMQP</option>
-                                        <option value="mqtt">MQTT</option>
-                                        <option value="websockets">WebSockets</option>
-                                        <option value="sftp">SFTP</option>
-                                        <option value="grpc">gRPC</option>
-                                        <option value="odata">OData</option>
+                                        <option value="http" {% if "http" in system.protocolos_suportados %}selected{% endif %}>HTTP</option>
+                                        <option value="https" {% if "https" in system.protocolos_suportados %}selected{% endif %}>HTTPS</option>
+                                        <option value="soap" {% if "soap" in system.protocolos_suportados %}selected{% endif %}>SOAP (via HTTP)</option>
+                                        <option value="amqp" {% if "amqp" in system.protocolos_suportados %}selected{% endif %}>AMQP</option>
+                                        <option value="mqtt" {% if "mqtt" in system.protocolos_suportados %}selected{% endif %}>MQTT</option>
+                                        <option value="websockets" {% if "websockets" in system.protocolos_suportados %}selected{% endif %}>WebSockets</option>
+                                        <option value="sftp" {% if "sftp" in system.protocolos_suportados %}selected{% endif %}>SFTP</option>
+                                        <option value="grpc" {% if "grpc" in system.protocolos_suportados %}selected{% endif %}>gRPC</option>
+                                        <option value="odata" {% if "odata" in system.protocolos_suportados %}selected{% endif %}>OData</option>
                                     </select>
                                 </div>
-    
+                                
                                 <div class="col-md-12 mb-4">
                                     <label for="data_manipulation_format" class="form-label">Capacidades de manipulação de dados</label>
                                     <select class="form-select" id="data_manipulation_format" name="data_manipulation_format[]" multiple required style="width: 100%">
-                                        <option value="json">JSON</option>
-                                        <option value="xml">XML</option>
-                                        <option value="csv">CSV</option>
-                                        <option value="yaml">YAML</option>
+                                        <option value="json" {% if "json" in system.capacidades_dados %}selected{% endif %}>JSON</option>
+                                        <option value="xml" {% if "xml" in system.capacidades_dados %}selected{% endif %}>XML</option>
+                                        <option value="csv" {% if "csv" in system.capacidades_dados %}selected{% endif %}>CSV</option>
+                                        <option value="yaml" {% if "yaml" in system.capacidades_dados %}selected{% endif %}>YAML</option>
                                     </select>
-                                </div>
+                                </div>                                
                                 
                                 <div>
                                     <div class="col-md-12 mb-3">Informações do responsável</div>
 
                                     <div class="col-md-12 mb-3">
-                                        <input class="form-control" type="email" name="responsible_mail" placeholder="E-mail" required>
+                                        <input class="form-control" value="{{system.email_responsavel}}" type="email" name="responsible_mail" placeholder="E-mail" required>
                                     </div>
 
                                     <div class="col-md-12 mb-3">
-                                        <input class="form-control" type="tel" name="responsible_phone" placeholder="Telefone">
+                                        <input class="form-control" value="{{system.contato_responsavel}}" type="tel" name="responsible_phone" placeholder="Telefone">
                                     </div>
 
                                     <div class="col-md-12 mb-3">
-                                        <input class="form-control" type="text" name="maintainer" placeholder="Mantenedor do sistema">
+                                        <input class="form-control" value="{{system.mantenedor}}" type="text" name="maintainer" placeholder="Mantenedor do sistema">
                                     </div>
                                 </div>
                                 
                                 <div class="col-md-12 mb-4">
-                                    <label for="authentication_requirements" class="form-label">Requisitos de Autênticação</label>
+                                    <label for="authentication_requirements" class="form-label">Requisitos de Autenticação</label>
                                     <select class="form-select" id="authentication_requirements" name="authentication_requirements[]" multiple required style="width: 100%">
-                                        <option value="oauth">OAuth</option>
-                                        <option value="basic_auth">Basic Auth</option>
-                                        <option value="api_keys">API Keys</option>
-                                        <option value="bearer_token">Bearer Token</option>
+                                        <option value="oauth" {% if "oauth" in system.requisitos_autenticacao %}selected{% endif %}>OAuth</option>
+                                        <option value="basic_auth" {% if "basic_auth" in system.requisitos_autenticacao %}selected{% endif %}>Basic Auth</option>
+                                        <option value="api_keys" {% if "api_keys" in system.requisitos_autenticacao %}selected{% endif %}>API Keys</option>
+                                        <option value="bearer_token" {% if "bearer_token" in system.requisitos_autenticacao %}selected{% endif %}>Bearer Token</option>
                                     </select>
-                                </div>
+                                </div>                                
 
                                 <div class="d-grid">
-                                    <button value="create_system" id="submit" type="submit" class="btn btn-primary" value="register">Registrar</button>
+                                    <button value="create_system" id="submit" type="submit" class="btn btn-primary" value="update">Editar</button>
                                 </div>
                             
                             </form>

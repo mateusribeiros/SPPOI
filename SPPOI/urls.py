@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import project, rootPage, system, interface, integration
+from .views import project, rootPage, system, interface, integration, chat
 
 urlpatterns = [
     # Página inicial e laboratório
@@ -10,12 +10,14 @@ urlpatterns = [
     path('lab/project/<int:id>/', project.render_project, name='render_project'),
     path('lab/project/register/', project.register_project, name='register_project'),
     path('lab/project/<int:id>/delete/', project.delete, name='delete_project'),
+    path('lab/project/<int:id>/update/', project.update, name='update_project'),
 
     # Sistema
     path('lab/project/<int:id>/system/', system.render_system, name='render_system'),
     path('lab/project/<int:id>/system/register/', system.register, name='register_system'),
-    # path('lab/project/<int:id>/system/update/', system.update, name='update_system'), 
     path('lab/project/<int:id>/system/delete/<int:idSystem>/', system.delete, name='delete_system'),
+    path('lab/project/<int:id>/system/update/<int:idSystem>/', system.update, name='update_system'),
+    path('lab/project/<int:id>/system/updateData/<int:idSystem>/', system.updateData, name='update_systemData'),
 
     # Interface
     path('lab/project/<int:id>/interface/', interface.render_interface, name='render_interface'),
@@ -30,4 +32,6 @@ urlpatterns = [
     path('lab/project/<int:id>/integration/delete/<int:idIntegration>/', integration.delete, name='delete_integration'),
     path('lab/project/<int:id>/integration/update/<int:idIntegration>/', integration.update, name='update_integration'),
     path('lab/project/<int:id>/integration/updateData/<int:idIntegration>/', integration.updateData, name='update_integrationData'),
+
+    path('lab/project/<int:id>/chat/', chat.render_chat, name='render_chat'),
 ]

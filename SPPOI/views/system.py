@@ -61,12 +61,6 @@ def register(request, id):
     })
 
 @require_http_methods(["POST"])
-def update(request, id):
-    messages.warning(request, "Funcionalidade de atualização ainda não implementada.")
-    return HttpResponseRedirect(reverse('render_lab'))
-
-
-@require_http_methods(["POST"])
 def delete(request, id, idSystem):
     try:
         project = get_object_or_404(Projeto, pk=id)
@@ -85,3 +79,64 @@ def delete(request, id, idSystem):
         messages.error(request, f"Ocorreu um erro ao deletar o sistema: {str(e)}")
 
     return redirect('render_project', id=id)
+
+@require_http_methods(["POST"])
+def update(request, id, idSystem):
+    project = get_object_or_404(Projeto, pk=id)
+    system = get_object_or_404(Sistema, id=idSystem, projeto=project)
+    
+    context = {
+        'project': project,
+        'system': system
+    }
+
+    return render(request, 'updateSystem.html', context)
+
+@require_http_methods(["POST"])
+def updateData(request, id, idSystem):
+    try:
+        project = get_object_or_404(Projeto, pk=id)
+        updateSystem = get_object_or_404(Sistema, id=idSystem, projeto=project)
+
+        # Captura e validação do nome
+        nome = request.POST.get('name', '').strip()
+        if not nome:
+            raise ValueError("O nome do sistema é obrigatório.")
+
+        # Atribuição direta ao objeto updateSystem
+        updateSystem.nome = nome
+        updateSystem.descricao = request.POST.get('description', '').strip()
+        updateSystem.tipo = request.POST.get('type', '').strip()
+        updateSystem.versao = request.POST.get('version', '').strip()
+        updateSystem.funcionalidade_principal = request.POST.get('main_funcionality', '').strip()
+        updateSystem.protocolos_suportados = ", ".join(request.POST.getlist('protocolos[]'))
+        updateSystem.capacidades_dados = ", ".join(request.POST.getlist('data_manipulation_format[]'))
+        updateSystem.email_responsavel = request.POST.get('responsible_mail', '').strip()
+        updateSystem.contato_responsavel = request.POST.get('responsible_phone', '').strip()
+        updateSystem.mantenedor = request.POST.get('maintainer', '').strip()
+        updateSystem.requisitos_autenticacao = ", ".join(request.POST.getlist('authentication_requirements[]'))
+        updateSystem.projeto = project
+
+        updateSystem.save()
+    
+        messages.success(request, "Sistema atualizado com sucesso.")
+        return redirect(reverse('render_project', kwargs={'id': id}))
+
+    except ValueError as ve:
+        messages.error(request, str(ve))
+    except Sistema.DoesNotExist:
+        messages.error(request, "O sistema não foi encontrado.")
+    except Projeto.DoesNotExist:
+        messages.error(request, "Projeto não encontrado.")
+    except Exception as e:
+        messages.error(request, f"Ocorreu um erro ao atualizar o Sistema: {str(e)}")
+
+    project = get_object_or_404(Projeto, pk=id)
+    system = get_object_or_404(Sistema, id=idSystem, projeto=project)
+    
+    context = {
+        'project': project,
+        'system': system
+    }
+
+    return render(request, 'updateSystem.html', context)
