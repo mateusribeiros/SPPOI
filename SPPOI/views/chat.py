@@ -22,9 +22,9 @@ def render_chat(request, id):
         # Se for POST, significa que o usuário clicou para consultar a IA
         if request.method == "POST":
             # Criar prompt
-            prompt = create_prompt(project, mSystems, mInterfaces, mIntegrationStyles)
+            system_prompt, user_prompt, prompt = create_prompt(project, mSystems, mInterfaces, mIntegrationStyles)
             # Obter resposta da IA
-            ai_response = get_ai_response(prompt)
+            ai_response = get_ai_response(system_prompt, user_prompt)
 
         context = {
             'project': project,
@@ -43,66 +43,96 @@ def render_chat(request, id):
 
     
 def create_prompt(project, mSystems, mInterfaces, mIntegrationStyles):
-    prompt = f"""Você é uma IA especialista de alto nível em integração de sistemas, arquitetura de software e interoperabilidade. Seu objetivo é analisar ambientes de sistemas com foco em **melhorias, boas práticas e pontos críticos de atenção**, com base nos dados fornecidos.
+    system_prompt = (
+        "You are a highly specialized AI in systems integration, software architecture, and interoperability. "
+        "Your goal is to analyze system environments with a focus on **improvements, best practices, and critical points of attention**, "
+        "based on the provided data."
+    )
 
-    ### Contexto do Projeto
-    Projeto:
-    - Nome: {project.nome}
+    user_prompt = f"""### Project Context
+    Project:
+    - Name: {project.nome}
 
-    Sistemas:
+    Systems:
     """
     for system in mSystems:
-        prompt += (
-            f"- {system['nome']} (Tipo: {system['tipo']}, Versão: {system['versao']}, "
-            f"Função Principal: {system['funcionalidade_principal']}, Protocolos Suportados: {system['protocolos_suportados']}, "
-            f"Capacidades de Dados: {system['capacidades_dados']}, Mantenedor: {system['mantenedor']}, "
-            f"Autenticação: {system['requisitos_autenticacao']})\n"
+        user_prompt += (
+            f"- {system['nome']} (Type: {system['tipo']}, Version: {system['versao']}, "
+            f"Main Functionality: {system['funcionalidade_principal']}, Supported Protocols: {system['protocolos_suportados']}, "
+            f"Data Capabilities: {system['capacidades_dados']}, Maintainer: {system['mantenedor']}, "
+            f"Authentication: {system['requisitos_autenticacao']})\n"
         )
 
-    prompt += "\nInterfaces:\n"
+    user_prompt += "\nInterfaces:\n"
     for interface in mInterfaces:
-        prompt += (
-            f"- {interface['nome']} (Tipo: {interface['tipo']}, Endpoint: {interface['endpoint']}, "
-            f"Formato de Dados: {interface['formato_dados']}, Métodos Permitidos: {interface['metodos_permitidos']}, "
-            f"Autenticação: {interface['autenticacao']}, Operações Suportadas: {interface['operacoes_suportadas']})\n"
+        user_prompt += (
+            f"- {interface['nome']} (Type: {interface['tipo']}, Endpoint: {interface['endpoint']}, "
+            f"Data Format: {interface['formato_dados']}, Allowed Methods: {interface['metodos_permitidos']}, "
+            f"Authentication: {interface['autenticacao']}, Supported Operations: {interface['operacoes_suportadas']})\n"
         )
 
-    prompt += "\nEstilos de Integração:\n"
+    user_prompt += "\nIntegration Styles:\n"
     for style in mIntegrationStyles:
-        prompt += (
-            f"- {style.estilo} (De: {style.sistema_origem.nome} → Para: {style.sistema_destino.nome}, "
-            f"Detalhes: {style.detalhes})\n"
+        user_prompt += (
+            f"- {style.estilo} (From: {style.sistema_origem.nome} → To: {style.sistema_destino.nome}, "
+            f"Details: {style.detalhes})\n"
         )
 
-    prompt += """
+    user_prompt += """
 
-    ### Tarefas
-    1. Analise criticamente o ambiente apresentado com base em boas práticas reconhecidas da indústria (ex: desacoplamento, padronização, segurança, escalabilidade).
-    2. Sugira melhorias **específicas**, **concretas** e **executáveis** nos seguintes aspectos:
-    - Sistemas: arquitetura, segurança, capacidade de manutenção, uso de protocolos e dados.
-    - Interfaces: padronização, resiliência, versionamento, documentação, escalabilidade.
-    - Estilos de Integração: eficiência, sincronismo, acoplamento, modernização, event-driven, API-first.
-    3. Aponte riscos ou fragilidades que podem comprometer a interoperabilidade ou escalabilidade futura.
-    4. Forneça dicas práticas ou padrões arquiteturais que poderiam ser adotados para melhorar a integração.
+        ### Tasks
+        1. Critically analyze the described environment using recognized industry best practices (e.g., decoupling, standardization, security, scalability).
+           - The analysis must take into account **real data, duplication, protocol inconsistencies, authentication diversity**, and **data handling practices**.
+        2. Provide **specific**, **concrete**, and **actionable** improvement suggestions for:
+           - Systems: architecture, security, maintainability, use of protocols and data.
+           - Interfaces: standardization, resilience, versioning, documentation, scalability.
+           - Integration Styles: efficiency, synchronism, coupling, modernization, event-driven, API-first.
+           - All suggestions must be **clearly connected to an observed point in the scenario** and not generic.
+        3. Point out any risks or weaknesses that could compromise future interoperability or scalability.
+           - Explicitly mention if any modeling inconsistencies, duplications or outdated patterns are identified.
+        4. Offer practical tips or architectural patterns that could be adopted to enhance integration.
+           - Suggest tools, frameworks or practices (e.g., ELK Stack, Prometheus, Kafka, Swagger) when appropriate.
 
-    ### Requisitos de Resposta
-    - Escreva em **português brasileiro**, de forma clara, técnica e objetiva.
-    - Não inclua saudações, desculpas ou referências a você mesmo.
-    - Não faça suposições sobre o que o usuário já sabe ou não. Foque na clareza e na precisão técnica.
-    - Apresente uma análise detalhada, porém gerencie de maneira econômica o espaço de resposta.
-    - Gerencie a resposta para possuir no máximo 2000 tokens, sem encerrar a resposta abruptamente e contendo uma conclusão clara.
-    - Evite repetições e redundâncias. Cada frase deve agregar valor à análise.
-    - Finalize a resposta após a conclusão. **Não repita, não reinicie, nem ultrapasse os 2000 tokens.**
-    - Lembre-se que o seu público são **desenvolvedores e arquitetos de software**.
-    - Estruture a resposta assim:
-    - **Nomes Extraídos**: [lista separada por vírgulas]
-    - **Análise e Melhorias**: [tópicos com bullet points]
+        ### Response Requirements
+        - Write the full response in **Brazilian Portuguese**, clearly, technically, and objectively.
+        - Do not include greetings, apologies, or references to yourself.
+        - Do not assume prior user knowledge; focus on technical clarity and precision.
+        - Ensure a detailed yet concise response, using space efficiently.
+        - Keep the output under **2000 tokens**, ending with a clear conclusion and without cutting off abruptly.
+        - Avoid repetition and redundancy—each sentence must add value.
+        - Conclude the response properly. **Do not repeat, restart, or exceed the token limit.**
+        - Remember: the target audience is **software developers and architects**.
+        - Justify your suggestions based on recognized best practices and explain the reasoning behind each recommendation.
+        - Connect each recommendation directly to the described scenario.
+        - Structure your response like this:
+        - **Analysis and Recommendations**: [bullet points]
     """
 
-    return prompt
+    system_prompt = (
+        f"<|im_start|>system<|im_sep|>\n{system_prompt}<|im_end|>\n"
+    )
+    user_prompt = (
+        f"<|im_start|>user<|im_sep|>\n{user_prompt}<|im_end|>\n"
+    )
+
+    full_prompt = system_prompt + user_prompt
+
+    return system_prompt, user_prompt, full_prompt
 
 
-def get_ai_response(prompt):
+
+# def get_ai_response(prompt):
+
+#     messages = [
+#     {"role": "user", "content": prompt},
+#     ]
+
+#     pipe = pipeline("text-generation", model="microsoft/Phi-3-mini-128k-instruct", trust_remote_code=True)
+#     ai_response = pipe(messages)
+
+#     return ai_response
+
+def get_ai_response(system_prompt, user_prompt):
     # Pegue o token do ambiente
     hf_token = settings.HF_API_TOKEN  # ou use os.environ.get('HF_API_TOKEN') se preferir
     
@@ -110,9 +140,9 @@ def get_ai_response(prompt):
         raise Exception("Token da HuggingFace não encontrado nas variáveis de ambiente.")
 
     # Escolha o modelo que aceita prompts grandes (exemplo: mistralai/Mistral-7B-v0.1)
-    model_id = "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO"
+    model_id = "microsoft/phi-4"
 
-    api_url = f"https://router.huggingface.co/together/v1/chat/completions"
+    api_url = f"https://router.huggingface.co/nebius/v1/chat/completions"
 
     headers = {
         "Authorization": f"Bearer {hf_token}",
@@ -122,7 +152,8 @@ def get_ai_response(prompt):
 
     payload = {
         "messages": [
-            {"role": "user", "content": prompt}
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
         ],
         "model": model_id,
         "max_tokens": 2000,
@@ -142,6 +173,7 @@ def get_ai_response(prompt):
     generated_text = result["choices"][0]["message"]["content"]
 
     return generated_text
+
 
 def get_project_data(project_id):
     # Busca o projeto e seus dados internos 
