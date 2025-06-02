@@ -1,29 +1,37 @@
-from django.urls import reverse
-from django.views.decorators.http import require_http_methods
-from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect, render
-from django.contrib import messages
-from SPPOI.models import Projeto, Sistema, Interface, EstiloIntegracao
-from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
 import os
 import requests
 from django.conf import settings
+from django.urls import reverse
+from django.contrib import messages
+from django.http import HttpResponseRedirect
+from langchain_chroma import Chroma
+from django.shortcuts import get_object_or_404, render
+from django.views.decorators.http import require_http_methods
+from SPPOI.models import Projeto, Sistema, Interface, EstiloIntegracao
+from langchain_community.document_loaders import DirectoryLoader
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+DATA_PATH = os.path.join(settings.BASE_DIR, 'dados')
+CHROMA_PATH = os.path.join(settings.BASE_DIR, 'chroma_db')
+
+os.makedirs(DATA_PATH, exist_ok=True)
+os.makedirs(CHROMA_PATH, exist_ok=True)
 
 @require_http_methods(["GET", "POST"])
 def render_chat(request, id):
     try:
-        # Buscar os dados do projeto e relacionados
         project, mSystems, mInterfaces, mIntegrationStyles = get_project_data(id)
 
-        # Inicializa valores padrão
         prompt = None
         ai_response = None
 
-        # Se for POST, significa que o usuário clicou para consultar a IA
         if request.method == "POST":
-            # Criar prompt
             system_prompt, user_prompt, prompt = create_prompt(project, mSystems, mInterfaces, mIntegrationStyles)
-            # Obter resposta da IA
+            
+            if not os.path.exists(CHROMA_PATH):
+                prepare_chroma_db()
+
             ai_response = get_ai_response(system_prompt, user_prompt)
 
         context = {
@@ -46,7 +54,9 @@ def create_prompt(project, mSystems, mInterfaces, mIntegrationStyles):
     system_prompt = (
         "You are a highly specialized AI in systems integration, software architecture, and interoperability. "
         "Your goal is to analyze system environments with a focus on **improvements, best practices, and critical points of attention**, "
-        "based on the provided data."
+        "based exclusively on the provided data. Always: "
+        "- Justify recommendations with clear technical trade-offs "
+        "- Indicate implementation effort levels (low/medium/high)"
     )
 
     user_prompt = f"""### Project Context
@@ -80,32 +90,45 @@ def create_prompt(project, mSystems, mInterfaces, mIntegrationStyles):
 
     user_prompt += """
 
-        ### Tasks
-        1. Critically analyze the described environment using recognized industry best practices (e.g., decoupling, standardization, security, scalability).
-           - The analysis must take into account **real data, duplication, protocol inconsistencies, authentication diversity**, and **data handling practices**.
-        2. Provide **specific**, **concrete**, and **actionable** improvement suggestions for:
-           - Systems: architecture, security, maintainability, use of protocols and data.
-           - Interfaces: standardization, resilience, versioning, documentation, scalability.
-           - Integration Styles: efficiency, synchronism, coupling, modernization, event-driven, API-first.
-           - All suggestions must be **clearly connected to an observed point in the scenario** and not generic.
+        Tasks
+        1. Critical Analysis:
+           - Evaluate using industry best practices (decoupling, standardization, security, scalability, and other relevant patterns).
+           - Analyze integration and interoperability aspects.
+           - Identify underutilized capabilities in existing systems
+        2. Improvement Suggestions (Specific, Concrete and Actionable):
+            Cover:
+            - Systems: architecture, security, maintainability, use of protocols and data.
+            - Interfaces: standardization, resilience, versioning, documentation, scalability.
+            - Integration Styles: efficiency, synchronism, coupling, modernization, event-driven, API-first.
+            For each recommendation:
+            - All suggestions must be "clearly connected to an observed point in the scenario" and not generic.
+            - Provide abstract implementation examples
+            - Specify measurable KPIs for validation
+            - Explain expected outcomes
         3. Point out any risks or weaknesses that could compromise future interoperability or scalability.
+           - Identify interoperability/scalability threats with concrete impact scenarios
+           - Flag data modeling inconsistencies showing actual data examples
+           - Highlight technical debt
            - Explicitly mention if any modeling inconsistencies, duplications or outdated patterns are identified.
-        4. Offer practical tips or architectural patterns that could be adopted to enhance integration.
-           - Suggest tools, frameworks or practices (e.g., ELK Stack, Prometheus, Kafka, Swagger) when appropriate.
+        4. Enhancement Patterns:
+           - Recommend architectural patterns with implementation principles
+           - Suggest observable metrics for each improvement
+           - Provide phased migration approaches for legacy components
 
-        ### Response Requirements
-        - Write the full response in **Brazilian Portuguese**, clearly, technically, and objectively.
+        Response Requirements
+        - Write the full response in "Brazilian Portuguese", clearly, technically, objectively and correctly.
+        - Structure: Clear sections for each task with subheadings
+        - Depth: Technical justifications with trade-off analysis
+        - Conclude the response properly. "Do not repeat, restart, or exceed the token limit."
+        - Audience: Software architects/developers
+        - Implementation examples must show abstract configuration patterns
+        - Migration: Detail operational steps with environment impact analysis
         - Do not include greetings, apologies, or references to yourself.
-        - Do not assume prior user knowledge; focus on technical clarity and precision.
+        - Conciseness: < 2000 tokens, no repetition and ending with a clear conclusion and without cutting off abruptly.
         - Ensure a detailed yet concise response, using space efficiently.
-        - Keep the output under **2000 tokens**, ending with a clear conclusion and without cutting off abruptly.
         - Avoid repetition and redundancy—each sentence must add value.
-        - Conclude the response properly. **Do not repeat, restart, or exceed the token limit.**
-        - Remember: the target audience is **software developers and architects**.
         - Justify your suggestions based on recognized best practices and explain the reasoning behind each recommendation.
         - Connect each recommendation directly to the described scenario.
-        - Structure your response like this:
-        - **Analysis and Recommendations**: [bullet points]
     """
 
     system_prompt = (
@@ -120,28 +143,37 @@ def create_prompt(project, mSystems, mInterfaces, mIntegrationStyles):
     return system_prompt, user_prompt, full_prompt
 
 
-
-# def get_ai_response(prompt):
-
-#     messages = [
-#     {"role": "user", "content": prompt},
-#     ]
-
-#     pipe = pipeline("text-generation", model="microsoft/Phi-3-mini-128k-instruct", trust_remote_code=True)
-#     ai_response = pipe(messages)
-
-#     return ai_response
-
 def get_ai_response(system_prompt, user_prompt):
-    # Pegue o token do ambiente
-    hf_token = settings.HF_API_TOKEN  # ou use os.environ.get('HF_API_TOKEN') se preferir
-    
+    hf_token = settings.HF_API_TOKEN
+
     if not hf_token:
         raise Exception("Token da HuggingFace não encontrado nas variáveis de ambiente.")
+    
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embeddings)
 
-    # Escolha o modelo que aceita prompts grandes (exemplo: mistralai/Mistral-7B-v0.1)
+    results = db.similarity_search_with_relevance_scores(user_prompt, k=3)
+
+    context_text = ""
+    relevant_docs = [doc for doc, score in results if score >= 0.75]
+    if not relevant_docs:
+        context_text = "Nenhum contexto relevante encontrado."
+    else:
+        context_text = "\n\n--\n\n".join([doc.page_content for doc in relevant_docs])
+
+    
+    context_text =  "\n\n--\n\n".join([doc.page_content for doc, score in results])
+    
+    prompt = f"""
+    [CONTEXT START]
+    {context_text}
+    [CONTEXT END]
+
+    User Question:
+    {user_prompt}
+    """
+
     model_id = "microsoft/phi-4"
-
     api_url = f"https://router.huggingface.co/nebius/v1/chat/completions"
 
     headers = {
@@ -149,16 +181,14 @@ def get_ai_response(system_prompt, user_prompt):
         "Content-Type": "application/json"
     }
     
-
     payload = {
         "messages": [
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
+            {"role": "user", "content": prompt},
         ],
         "model": model_id,
         "max_tokens": 2000,
     }
-
 
     response = requests.post(api_url, headers=headers, json=payload)
 
@@ -167,16 +197,31 @@ def get_ai_response(system_prompt, user_prompt):
         print(f"Detalhes do erro: {response.text}")
         raise Exception(f"Erro na API da HuggingFace: {response.status_code} - {response.text}")
 
-
     result = response.json()
 
     generated_text = result["choices"][0]["message"]["content"]
 
     return generated_text
 
+def prepare_chroma_db():
+    loader = DirectoryLoader(DATA_PATH, glob="*.md")
+    documents = loader.load()
+
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000,
+        chunk_overlap=500,
+        length_function=len,
+        add_start_index=True,
+    )
+
+    chunks = text_splitter.split_documents(documents)
+
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    db = Chroma.from_documents(chunks, embedding=embeddings, persist_directory=CHROMA_PATH)
+    db.persist()	
+
 
 def get_project_data(project_id):
-    # Busca o projeto e seus dados internos 
     project = get_object_or_404(Projeto, pk=project_id)
     mSystems = Sistema.objects.filter(projeto=project).values()
     mInterfaces = Interface.objects.filter(projeto=project).values()

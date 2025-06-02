@@ -69,7 +69,7 @@ def register(request, id):
                 "tipo_arquivo": request.POST.get("tipo_arquivo", "").strip(),
                 "protocolo_transferencia": request.POST.get("protocolo_transferencia", "").strip(),
                 "local_armazenamento": request.POST.get("local_armazenamento", "").strip(),
-                "transformacao": request.POST.get("transformacao_arquivo", "").strip(),
+                "transformacao_arquivo": request.POST.get("transformacao_arquivo", "").strip(),
             }
         else:
             raise ValueError("Estilo de integração inválido ou não reconhecido.")
@@ -175,7 +175,7 @@ def updateData(request, id, idIntegration):
                 "tipo_arquivo": request.POST.get("tipo_arquivo", "").strip(),
                 "protocolo_transferencia": request.POST.get("protocolo_transferencia", "").strip(),
                 "local_armazenamento": request.POST.get("local_armazenamento", "").strip(),
-                "transformacao": request.POST.get("transformacao_arquivo", "").strip(),
+                "transformacao_arquivo": request.POST.get("transformacao_arquivo", "").strip(),
             }
         else:
             raise ValueError("Estilo de integração inválido ou não reconhecido.")

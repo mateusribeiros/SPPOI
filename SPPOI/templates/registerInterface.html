@@ -52,8 +52,8 @@
                     <div class="card shadow p-4">
                         <div class="card-body">
                             <div class="container">
-                                <button class="btn btn-primary btn-voltar" onclick="window.history.back()">
-                                  <i class="bi bi-arrow-left"></i> Voltar
+                                <button class="btn btn-primary btn-voltar mb-4" onclick="window.history.back()" style="background-color: #124559;">
+                                    <i class="bi bi-arrow-left"></i> Voltar
                                 </button>
                             </div>
                             <h3 class="card-title mb-3 text-center">Registre</h3>
@@ -73,17 +73,32 @@
 
                                 <!-- Nome da Interface -->
                                 <div class="col-md-12 mb-3">
-                                    <input class="form-control" type="text" name="nome" placeholder="Nome da Interface" required>
+                                    <input class="form-control" type="text" name="nome" id="nome" placeholder="Nome da Interface" required>
                                 </div>
 
                                 <!-- Tipo da Interface -->
                                 <div class="col-md-12 mb-3">
-                                    <select name="tipo" class="form-select" required>
-                                        <option selected disabled value="">Tipo de Interface</option>
-                                        <option value="REST API">REST API</option>
-                                        <option value="SOAP">SOAP</option>
-                                        <option value="DB">Conexão com Banco de Dados</option>
+                                    <select name="tipo" id="tipo" class="form-select" required onchange="toggleOtherField(this)">
+                                          <option selected disabled value="">Tipo de Interface</option>
+                                            <option value="AMQP">AMQP</option>
+                                            <option value="CLI">Command Line Interface (CLI)</option>
+                                            <option value="DB">Conexão com Banco de Dados</option>
+                                            <option value="Email">Email</option>
+                                            <option value="File Exchange">Troca de Arquivos (CSV, XML, JSON)</option>
+                                            <option value="GraphQL API">GraphQL API</option>
+                                            <option value="gRPC">gRPC</option>
+                                            <option value="MQTT">MQTT</option>
+                                            <option value="REST API">REST API</option>
+                                            <option value="RPC">RPC</option>
+                                            <option value="SFTP">SFTP</option>
+                                            <option value="SOAP">SOAP</option>
+                                            <option value="WebSocket">WebSocket</option>
+                                            <option value="Outro">Outro</option>
                                     </select>
+                                </div>
+
+                                <div class="col-md-12 mb-3" id="otherTypeContainer" style="display:none;">
+                                    <input type="text" name="othertype" id="othertype" class="form-control" placeholder="Descreva o tipo da interface">
                                 </div>
 
                                 <!-- Endpoint -->
@@ -95,8 +110,15 @@
                                 <div class="col-md-12 mb-3">
                                     <select name="formato_dados" class="form-select" required id="formatoDados">
                                         <option selected disabled value="">Formato de Troca de Dados</option>
+                                        <option value="Avro">Apache Avro</option>
+                                        <option value="CSV">CSV</option>
+                                        <option value="INI">INI (Initialization files)</option>
                                         <option value="JSON">JSON</option>
+                                        <option value="MessagePack">MessagePack</option>
+                                        <option value="Protobuf">Protobuf (Protocol Buffers)</option>
+                                        <option value="Thrift">Apache Thrift</option>
                                         <option value="XML">XML</option>
+                                        <option value="YAML">YAML</option>
                                     </select>
                                 </div>
 
@@ -109,17 +131,20 @@
 
                                     <!-- Esquema JSON ou XSD -->
                                     <div class="col-md-12 mb-3">
+                                        <label for="esquema" class="form-label">Esquema JSON ou XSD</label>
                                         <textarea class="form-control" name="esquema" placeholder="Esquema JSON ou XSD" rows="5"></textarea>
                                     </div>
 
                                     <!-- Exemplo de Dados -->
                                     <div class="col-md-12 mb-3">
+                                        <label for="exemploDados" class="form-label">Exemplo de Dados</label>
                                         <textarea class="form-control" name="exemplo_dados" placeholder="Exemplo de Dados (JSON ou XML)" rows="5"></textarea>
                                     </div>
                                 </div>
 
                                 <!-- Operações Suportadas -->
                                 <div class="col-md-12 mb-3">
+                                    <label for="operacoesSuportadas" class="form-label">Operações Suportadas</label>
                                     <textarea class="form-control" name="operacoes_suportadas" placeholder="Operações Suportadas (CRUD, buscar por ID, etc.)" rows="3"></textarea>
                                 </div>
 
@@ -127,10 +152,25 @@
                                 <div class="col-md-12 mb-4">
                                     <label for="autenticacao" class="form-label">Requisitos de Autênticação</label>
                                     <select class="form-select" id="autenticacao" name="autenticacao[]" multiple required style="width: 100%">
-                                        <option value="oauth">OAuth</option>
-                                        <option value="basic_auth">Basic Auth</option>
+                                        <option value="active_directory">Active Directory</option>
                                         <option value="api_keys">API Keys</option>
+                                        <option value="basic_auth">Basic Auth</option>
                                         <option value="bearer_token">Bearer Token</option>
+                                        <option value="biometric">Biometria (Face ID, impressão digital)</option>
+                                        <option value="client_certificate">Client Certificate</option>
+                                        <option value="device_token">Device Token</option>
+                                        <option value="fingerprint">Digital Fingerprint</option>
+                                        <option value="hardware_token">Hardware Token (e.g., YubiKey)</option>
+                                        <option value="jwt">JWT (JSON Web Token)</option>
+                                        <option value="kerberos">Kerberos</option>
+                                        <option value="ldap">LDAP (Lightweight Directory Access Protocol)</option>
+                                        <option value="mfa">MFA (Multi-Factor Authentication)</option>
+                                        <option value="mutual_tls">Mutual TLS (mTLS)</option>
+                                        <option value="oauth">OAuth</option>
+                                        <option value="openid_connect">OpenID Connect</option>
+                                        <option value="otp">OTP (One-Time Password)</option>
+                                        <option value="saml">SAML (Security Assertion Markup Language)</option>
+                                        <option value="session_cookie">Session Cookie</option>
                                     </select>
                                 </div>
 
@@ -140,8 +180,16 @@
                                 </div>
 
                                 <!-- Botão -->
-                                <div class="d-grid mt-4">
-                                    <button type="submit" class="btn btn-primary" value="register">Registrar Interface</button>
+                                <div class="d-grid">
+                                    <button 
+                                        value="create_system"
+                                        id="submit" 
+                                        type="submit" 
+                                        class="btn btn-lg rounded-pill text-white px-4" 
+                                        value="register"
+                                        style="background-color: #124559;">
+                                        Registrar Interface
+                                    </button>
                                 </div>
                             
                             </form>
@@ -178,9 +226,23 @@
         });
 
         $('#autenticacao').select2({
-            placeholder: "Selecione os requisitos de autênticação/autorização suportados",
+            placeholder: "Selecione os requisitos de autênticação/autorização",
             dropdownAutoWidth: true,
             width: 'resolve'
+        });
+
+        document.querySelector("form").addEventListener("submit", function (e) {
+            const tipoSelect = document.getElementById("tipo");
+            const otherInput = document.getElementById("othertype");
+
+            if (tipoSelect.value === "Outro" && otherInput.value.trim()) {
+                const hiddenTipo = document.createElement("input");
+                hiddenTipo.type = "hidden";
+                hiddenTipo.name = "tipo";
+                hiddenTipo.value = otherInput.value.trim();
+
+                this.appendChild(hiddenTipo);
+            }
         });
     </script>
 </body>

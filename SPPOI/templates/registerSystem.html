@@ -53,8 +53,8 @@
                     <div class="card shadow p-4">
                         <div class="card-body">
                             <div class="container">
-                                <button class="btn btn-primary btn-voltar" onclick="window.history.back()">
-                                  <i class="bi bi-arrow-left"></i> Voltar
+                                <button class="btn btn-primary btn-voltar mb-4" onclick="window.history.back()" style="background-color: #124559;">
+                                    <i class="bi bi-arrow-left"></i> Voltar
                                 </button>
                             </div>
                             <h3 class="card-title mb-3 text-center">Registre</h3>
@@ -71,16 +71,33 @@
                                 </div>
     
                                 <div class="col-md-12 mb-3">
-                                    <select name="type" class="form-select" required>
+                                    <select name="type" id="type" class="form-select" required onchange="toggleOtherField(this)">
                                         <option selected disabled value="">Tipo de sistema</option>
-                                        <option value="BI - Business Intelligence">BI - Business Intelligence</option>
+                                        <option value="API Gateway">API Gateway</option>
+                                        <option value="BPM - Business Process Management">BPM - Business Process Management</option>
+                                        <option value="CMS - Content Management System">CMS - Content Management System</option>
                                         <option value="CRM - Customer Relationship Management">CRM - Customer Relationship Management</option>
+                                        <option value="DAS - Data Analytics System">DAS - Data Analytics System</option>
+                                        <option value="DMS - Document Management System">DMS - Document Management System</option>
+                                        <option value="E-commerce">E-commerce</option>
                                         <option value="ERP - Enterprise Resource Planning">ERP - Enterprise Resource Planning</option>
-                                        <option value="Gateway de pagamentos">Gateway de pagamentos</option>
-                                        <option value="SCM - Supply Chain Management">SCM - Supply Chain Management</option>
-                                        <option value="WMS - Warehouse Management System">WMS - Warehouse Management System</option>
+                                        <option value="HCM - Human Capital Management">HCM - Human Capital Management</option>
+                                        <option value="IAM - Identity and Access Management">IAM - Identity and Access Management</option>
+                                        <option value="IoT Platform">IoT Platform</option>
+                                        <option value="LMS - Learning Management System">LMS - Learning Management System</option>
+                                        <option value="MDM - Master Data Management">MDM - Master Data Management</option>
+                                        <option value="MES - Manufacturing Execution System">MES - Manufacturing Execution System</option>
+                                        <option value="Mobile Backend">Mobile Backend</option>
+                                        <option value="SaaS - Software as a Service">SaaS - Software as a Service</option>
+                                        <object value="SCM - Supply Chain Management">SCM - Supply Chain Management</object>
+                                        <option value="SCADA - Supervisory Control and Data Acquisition">SCADA - Supervisory Control and Data Acquisition</option>
+                                        <option value="SIEM - Security Information and Event Management">SIEM - Security Information and Event Management</option>
+                                        <option value="Outro">Outro</option>
                                     </select>
-                            
+                                </div>
+
+                                <div class="col-md-12 mb-3" id="otherTypeContainer" style="display:none;">
+                                    <input type="text" name="type" id="type" class="form-control" placeholder="Descreva o tipo do sistema">
                                 </div>
                                 
                                 <div class="col-md-12 mb-3">
@@ -92,30 +109,87 @@
                                 </div>
     
                                 <div class="col-md-12 mb-3">
-                                    <label for="protocolosSuportados" class="form-label">Protocolos Suportados</label>
+                                    <label for="protocolosSuportados" class="form-label">Protocolos suportados</label>
                                     <select class="form-select" id="protocolosSuportados" name="protocolos[]" multiple required style="width: 100%">
+                                        <option value="amqp">AMQP</option>
+                                        <option value="coap">CoAP</option>
+                                        <option value="ftp">FTP</option>
+                                        <option value="ftps">FTPS</option>
+                                        <option value="graphql">GraphQL</option>
+                                        <option value="grpc">gRPC</option>
                                         <option value="http">HTTP</option>
                                         <option value="https">HTTPS</option>
-                                        <option value="soap">SOAP (via HTTP)</option>
-                                        <option value="amqp">AMQP</option>
+                                        <option value="kafka">Kafka</option>
+                                        <option value="ldap">LDAP</option>
+                                        <option value="modbus">Modbus</option>
                                         <option value="mqtt">MQTT</option>
-                                        <option value="websockets">WebSockets</option>
-                                        <option value="sftp">SFTP</option>
-                                        <option value="grpc">gRPC</option>
                                         <option value="odata">OData</option>
+                                        <option value="rest">REST</option>
+                                        <option value="scp">SCP</option>
+                                        <option value="sftp">SFTP</option>
+                                        <option value="snmp">SNMP</option>
+                                        <option value="soap">SOAP (via HTTP)</option>
+                                        <option value="websockets">WebSockets</option>
                                     </select>
                                 </div>
     
-                                <div class="col-md-12 mb-4">
+                                <div class="col-md-12 mb-3">
                                     <label for="data_manipulation_format" class="form-label">Capacidades de manipulação de dados</label>
                                     <select class="form-select" id="data_manipulation_format" name="data_manipulation_format[]" multiple required style="width: 100%">
-                                        <option value="json">JSON</option>
-                                        <option value="xml">XML</option>
+                                        <option value="avro">Apache Avro</option>
+                                        <option value="orc">Apache ORC</option>
+                                        <option value="parquet">Apache Parquet</option>
+                                        <option value="bson">BSON (Binary JSON)</option>
                                         <option value="csv">CSV</option>
+                                        <option value="hdf5">HDF5 (Hierarchical Data Format)</option>
+                                        <option value="html">HTML</option>
+                                        <option value="ini">INI</option>
+                                        <option value="json">JSON</option>
+                                        <option value="log">Arquivo de log (.log)</option>
+                                        <option value="markdown">Markdown</option>
+                                        <option value="mat">MATLAB .mat</option>
+                                        <option value="msgpack">MessagePack</option>
+                                        <option value="ndjson">NDJSON (Newline-delimited JSON)</option>
+                                        <option value="netcdf">NetCDF</option>
+                                        <option value="ods">OpenDocument Spreadsheet (ODS)</option>
+                                        <option value="pdf">PDF (para relatórios)</option>
+                                        <option value="properties">Java .properties</option>
+                                        <option value="protobuf">Protobuf (Protocol Buffers)</option>
+                                        <option value="rdf">RDF (Resource Description Framework)</option>
+                                        <option value="toml">TOML</option>
+                                        <option value="tsv">TSV (Tab-Separated Values)</option>
+                                        <option value="ttl">Turtle (RDF serialization)</option>
+                                        <option value="xlsx">Excel (XLSX)</option>
+                                        <option value="xml">XML</option>
                                         <option value="yaml">YAML</option>
                                     </select>
                                 </div>
                                 
+                                <div class="col-md-12 mb-3">
+                                    <label for="authentication_requirements" class="form-label">Requisitos de Autênticação</label>
+                                    <select class="form-select" id="authentication_requirements" name="authentication_requirements[]" multiple required style="width: 100%">
+                                        <option value="active_directory">Active Directory</option>
+                                        <option value="api_keys">API Keys</option>
+                                        <option value="basic_auth">Basic Auth</option>
+                                        <option value="bearer_token">Bearer Token</option>
+                                        <option value="biometric">Biometria (Face ID, impressão digital)</option>
+                                        <option value="client_certificate">Client Certificate</option>
+                                        <option value="device_token">Device Token</option>
+                                        <option value="fingerprint">Digital Fingerprint</option>
+                                        <option value="hardware_token">Hardware Token (e.g., YubiKey)</option>
+                                        <option value="jwt">JWT (JSON Web Token)</option>
+                                        <option value="kerberos">Kerberos</option>
+                                        <option value="ldap">LDAP (Lightweight Directory Access Protocol)</option>
+                                        <option value="mfa">MFA (Multi-Factor Authentication)</option>
+                                        <option value="mutual_tls">Mutual TLS (mTLS)</option>
+                                        <option value="oauth">OAuth</option>
+                                        <option value="openid_connect">OpenID Connect</option>
+                                        <option value="otp">OTP (One-Time Password)</option>
+                                        <option value="saml">SAML (Security Assertion Markup Language)</option>
+                                        <option value="session_cookie">Session Cookie</option>
+                                    </select>
+                                </div>
+
                                 <div>
                                     <div class="col-md-12 mb-3">Informações do responsável</div>
 
@@ -131,21 +205,19 @@
                                         <input class="form-control" type="text" name="maintainer" placeholder="Mantenedor do sistema">
                                     </div>
                                 </div>
-                                
-                                <div class="col-md-12 mb-4">
-                                    <label for="authentication_requirements" class="form-label">Requisitos de Autênticação</label>
-                                    <select class="form-select" id="authentication_requirements" name="authentication_requirements[]" multiple required style="width: 100%">
-                                        <option value="oauth">OAuth</option>
-                                        <option value="basic_auth">Basic Auth</option>
-                                        <option value="api_keys">API Keys</option>
-                                        <option value="bearer_token">Bearer Token</option>
-                                    </select>
-                                </div>
 
                                 <div class="d-grid">
-                                    <button value="create_system" id="submit" type="submit" class="btn btn-primary" value="register">Registrar</button>
+                                    <button 
+                                        value="create_system"
+                                        id="submit" 
+                                        type="submit" 
+                                        class="btn btn-lg rounded-pill text-white px-4" 
+                                        value="register"
+                                        style="background-color: #124559;">
+                                        Registrar Sistema
+                                    </button>
                                 </div>
-                            
+                                
                             </form>
                         </div>
                     </div>
@@ -166,20 +238,30 @@
     <script src="{% static 'bootstrap/js/registerSystem.js'%}"></script>
     <script>
         $('#protocolosSuportados').select2({
-            placeholder: "Selecione os protocolos suportados",
+            placeholder: "Selecione um ou mais protocolos",
             dropdownAutoWidth: true,
             width: 'resolve'
         });
         $('#data_manipulation_format').select2({
-            placeholder: "Selecione os formatos suportados",
+            placeholder: "Selecione um ou mais formatos de manipulação de dados",
             dropdownAutoWidth: true,
             width: 'resolve'
         });
         $('#authentication_requirements').select2({
-            placeholder: "Selecione os requisitos suportados",
+            placeholder: "Selecione um ou mais requisitos de autenticação",
             dropdownAutoWidth: true,
             width: 'resolve'
         });
+        function toggleOtherField(select) {
+            const otherField = document.getElementById('otherTypeContainer');
+            if (select.value === "Outro") {
+                otherField.style.display = 'block';
+                document.getElementById('otherType').setAttribute('required', 'required');
+            } else {
+                otherField.style.display = 'none';
+                document.getElementById('otherType').removeAttribute('required');
+            }
+        }
     </script>
 </body>
 </html>

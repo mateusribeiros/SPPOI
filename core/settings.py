@@ -33,11 +33,27 @@ INSTALLED_APPS = [
     'SPPOI',
     'django.contrib.admin',
     'django.contrib.auth',
+    'markdownify',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+MARKDOWNIFY = {
+    "default": {
+        "WHITELIST_TAGS": [
+            'a', 'abbr', 'acronym', 'b', 'blockquote', 'code', 'em',
+            'i', 'li', 'ol', 'strong', 'ul', 'h1', 'h2', 'h3', 'h4', 'p',
+            'pre', 'br',
+        ],
+        "WHITELIST_ATTRS": ['href', 'title'],
+        "MARKDOWN_EXTENSIONS": [
+            'markdown.extensions.fenced_code',
+            'markdown.extensions.codehilite',
+        ],
+    }
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
