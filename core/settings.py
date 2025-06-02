@@ -28,6 +28,8 @@ STATICFILES_DIRS = [
 ]
 
 ALLOWED_HOSTS = ['*']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 # Application definition
 
 INSTALLED_APPS = [
