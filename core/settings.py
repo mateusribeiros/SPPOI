@@ -27,6 +27,7 @@ STATICFILES_DIRS = [
     BASE_DIR / "SPPOI/templates/static",
 ]
 
+ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
