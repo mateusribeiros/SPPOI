@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from langchain_chroma import Chroma
+
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_http_methods
 from SPPOI.models import Projeto, Sistema, Interface, EstiloIntegracao
