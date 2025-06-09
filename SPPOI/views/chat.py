@@ -12,9 +12,11 @@ from SPPOI.models import Projeto, Sistema, Interface, EstiloIntegracao
 from langchain_community.document_loaders import DirectoryLoader
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from transformers import pipeline
 
 DATA_PATH = os.path.join(settings.BASE_DIR, 'dados')
 CHROMA_PATH = os.path.join(settings.BASE_DIR, 'chroma_db')
+HF_TOKEN = settings.HF_API_TOKEN
 
 os.makedirs(DATA_PATH, exist_ok=True)
 os.makedirs(CHROMA_PATH, exist_ok=True)
@@ -54,10 +56,12 @@ def render_chat(request, id):
 def create_prompt(project, mSystems, mInterfaces, mIntegrationStyles):
     system_prompt = (
         "You are a highly specialized AI in systems integration, software architecture, and interoperability. "
-        "Your goal is to analyze system environments with a focus on **improvements, best practices, and critical points of attention**, "
+        "Your goal is to analyze system environments with a focus on **improvements, best practices, integration and critical points of attention**, "
         "based exclusively on the provided data. Always: "
         "- Justify recommendations with clear technical trade-offs "
-        "- Indicate implementation effort levels (low/medium/high)"
+        "- Important:  Respond exclusively in Brazilian Portuguese, with correct syntax and semantics, as if written by a fluent technical writer;"
+        "Write the entire response in correct Brazilian Portuguese, using fluent and professional grammatical structure, preserving only technical terms in English."
+        "Never translate established technical domain terms into Portuguese;"
     )
 
     user_prompt = f"""### Project Context
@@ -93,13 +97,13 @@ def create_prompt(project, mSystems, mInterfaces, mIntegrationStyles):
 
         Tasks
         1. Critical Analysis:
-           - Evaluate using industry best practices (decoupling, standardization, security, scalability, and other relevant patterns).
+           - Evaluate using industry best practices (decoupling, standards, security, scalability, and other relevant patterns).
            - Analyze integration and interoperability aspects.
            - Identify underutilized capabilities in existing systems
         2. Improvement Suggestions (Specific, Concrete and Actionable):
             Cover:
             - Systems: architecture, security, maintainability, use of protocols and data.
-            - Interfaces: standardization, resilience, versioning, documentation, scalability.
+            - Interfaces: standards, resilience, versioning, documentation, scalability.
             - Integration Styles: efficiency, synchronism, coupling, modernization, event-driven, API-first.
             For each recommendation:
             - All suggestions must be "clearly connected to an observed point in the scenario" and not generic.
@@ -117,27 +121,18 @@ def create_prompt(project, mSystems, mInterfaces, mIntegrationStyles):
            - Provide phased migration approaches for legacy components
 
         Response Requirements
-        - Write the full response in "Brazilian Portuguese", clearly, technically, objectively and correctly.
-        - Structure: Clear sections for each task with subheadings
         - Depth: Technical justifications with trade-off analysis
         - Conclude the response properly. "Do not repeat, restart, or exceed the token limit."
         - Audience: Software architects/developers
         - Implementation examples must show abstract configuration patterns
         - Migration: Detail operational steps with environment impact analysis
         - Do not include greetings, apologies, or references to yourself.
-        - Conciseness: < 2000 tokens, no repetition and ending with a clear conclusion and without cutting off abruptly.
+        - Conciseness: < 1500 tokens, no repetition and ending with a clear conclusion and without cutting off abruptly.
         - Ensure a detailed yet concise response, using space efficiently.
         - Avoid repetition and redundancy—each sentence must add value.
         - Justify your suggestions based on recognized best practices and explain the reasoning behind each recommendation.
         - Connect each recommendation directly to the described scenario.
     """
-
-    system_prompt = (
-        f"<|im_start|>system<|im_sep|>\n{system_prompt}<|im_end|>\n"
-    )
-    user_prompt = (
-        f"<|im_start|>user<|im_sep|>\n{user_prompt}<|im_end|>\n"
-    )
 
     full_prompt = system_prompt + user_prompt
 
@@ -145,9 +140,8 @@ def create_prompt(project, mSystems, mInterfaces, mIntegrationStyles):
 
 
 def get_ai_response(system_prompt, user_prompt):
-    hf_token = settings.HF_API_TOKEN
 
-    if not hf_token:
+    if not HF_TOKEN:
         raise Exception("Token da HuggingFace não encontrado nas variáveis de ambiente.")
     
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
@@ -157,14 +151,11 @@ def get_ai_response(system_prompt, user_prompt):
 
     context_text = ""
     relevant_docs = [doc for doc, score in results if score >= 0.75]
-    if not relevant_docs:
-        context_text = "Nenhum contexto relevante encontrado."
-    else:
-        context_text = "\n\n--\n\n".join([doc.page_content for doc in relevant_docs])
+    context_text = (
+        "\n\n--\n\n".join([doc.page_content for doc in relevant_docs])
+        if relevant_docs else "Nenhum contexto relevante encontrado."
+    )
 
-    
-    context_text =  "\n\n--\n\n".join([doc.page_content for doc, score in results])
-    
     prompt = f"""
     [CONTEXT START]
     {context_text}
@@ -172,13 +163,14 @@ def get_ai_response(system_prompt, user_prompt):
 
     User Question:
     {user_prompt}
+    Write the entire response in correct Brazilian Portuguese, using fluent and professional grammatical structure, preserving only technical terms in English.
     """
 
     model_id = "microsoft/phi-4"
     api_url = f"https://router.huggingface.co/nebius/v1/chat/completions"
 
     headers = {
-        "Authorization": f"Bearer {hf_token}",
+        "Authorization": f"Bearer {HF_TOKEN}",
         "Content-Type": "application/json"
     }
     
@@ -189,6 +181,8 @@ def get_ai_response(system_prompt, user_prompt):
         ],
         "model": model_id,
         "max_tokens": 2000,
+        "temperature": 0.7,
+        "top_p": 0.9,
     }
 
     response = requests.post(api_url, headers=headers, json=payload)
@@ -220,7 +214,6 @@ def prepare_chroma_db():
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     db = Chroma.from_documents(chunks, embedding=embeddings, persist_directory=CHROMA_PATH)
     db.persist()	
-
 
 def get_project_data(project_id):
     project = get_object_or_404(Projeto, pk=project_id)
