@@ -25,7 +25,6 @@ def register(request, id):
     try:
         project = get_object_or_404(Projeto, pk=id)
 
-        # Captura e validação básica de campos
         nome = request.POST.get('name', '').strip()
         if not nome:
             raise ValueError("O nome do sistema é obrigatório.")
@@ -54,7 +53,6 @@ def register(request, id):
     except Exception as e:
         messages.error(request, f"Ocorreu um erro inesperado ao registrar o sistema: {str(e)}")
 
-    # Recarregar a página com dados em caso de erro
     project = get_object_or_404(Projeto, pk=id)
     return render(request, 'registerSystem.html', {
         'project': project
@@ -98,12 +96,10 @@ def updateData(request, id, idSystem):
         project = get_object_or_404(Projeto, pk=id)
         updateSystem = get_object_or_404(Sistema, id=idSystem, projeto=project)
 
-        # Captura e validação do nome
         nome = request.POST.get('name', '').strip()
         if not nome:
             raise ValueError("O nome do sistema é obrigatório.")
 
-        # Atribuição direta ao objeto updateSystem
         updateSystem.nome = nome
         updateSystem.descricao = request.POST.get('description', '').strip()
         updateSystem.tipo = request.POST.get('type', '').strip()

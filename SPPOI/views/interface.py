@@ -26,14 +26,12 @@ def register(request, id):
     try:
         project = get_object_or_404(Projeto, pk=id)
 
-        # Validação de sistema
         system_id = request.POST.get('sistema_id')
         if not system_id:
             raise ValueError("Sistema não selecionado.")
 
         system = get_object_or_404(Sistema, pk=system_id)
 
-        # Campos obrigatórios
         nome = request.POST.get("nome", "").strip()
         tipo = request.POST.get("tipo", "").strip()
 
@@ -115,7 +113,6 @@ def updateData(request, id, idInterface):
         sistema = get_object_or_404(Sistema, pk=sistema_id)
         updateInterface.sistema = sistema
 
-        # Campos
         updateInterface.nome = request.POST.get("nome", "").strip()
         updateInterface.tipo = request.POST.get("tipo", "").strip()
         updateInterface.endpoint=request.POST.get("endpoint", "").strip()

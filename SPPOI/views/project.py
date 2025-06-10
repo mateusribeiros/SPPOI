@@ -5,7 +5,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from SPPOI.models import Projeto, Sistema, Interface, EstiloIntegracao
 
-# Verifica ou cria uma chave de sessão para o usuário
 def create_session(request):
     if not request.session.session_key:
         request.session.create()
