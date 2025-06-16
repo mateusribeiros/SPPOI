@@ -7,7 +7,7 @@ from SPPOI.models import Projeto, Sistema, EstiloIntegracao
 
 
 @require_http_methods(["GET"])
-def render_integration_form(request, id):
+def render_integration(request, id):
     try:
         project = get_object_or_404(Projeto, pk=id)
         mSystems = Sistema.objects.filter(projeto=project).values()
@@ -23,7 +23,7 @@ def render_integration_form(request, id):
 
 
 @require_http_methods(["POST"])
-def create_integration(request, id):
+def register(request, id):
     try:
         project = get_object_or_404(Projeto, pk=id)
 
@@ -100,7 +100,7 @@ def create_integration(request, id):
 
 
 @require_http_methods(["POST"])
-def delete_integration(request, id, idIntegration):
+def delete(request, id, idIntegration):
     try:
         project = get_object_or_404(Projeto, pk=id)
         integration = get_object_or_404(EstiloIntegracao, id=idIntegration, projeto=project)
@@ -119,7 +119,7 @@ def delete_integration(request, id, idIntegration):
 
 
 @require_http_methods(["POST"])
-def render_integration_update_form(request, id, idIntegration):
+def update(request, id, idIntegration):
     project = get_object_or_404(Projeto, pk=id)
     integration = get_object_or_404(EstiloIntegracao, id=idIntegration, projeto=project)
     mSystems = Sistema.objects.filter(projeto=project).values()
@@ -134,7 +134,7 @@ def render_integration_update_form(request, id, idIntegration):
 
 
 @require_http_methods(["POST"])
-def update_integration_data(request, id, idIntegration):
+def updateData(request, id, idIntegration):
     try:
         project = get_object_or_404(Projeto, pk=id)
         integration = get_object_or_404(EstiloIntegracao, id=idIntegration, projeto=project)
