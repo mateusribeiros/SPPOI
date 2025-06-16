@@ -27,7 +27,7 @@ STATICFILES_DIRS = [
     BASE_DIR / "SPPOI/templates/static",
 ]
 
-ALLOWED_HOSTS = ['159.203.191.27', 'sppoitool.xyz']
+ALLOWED_HOSTS = ['sppoitool.xyz']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 
