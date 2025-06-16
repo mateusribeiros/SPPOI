@@ -16,8 +16,8 @@ class Sistema(models.Model):
     tipo = models.CharField(max_length=50)
     versao = models.CharField(max_length=20)
     funcionalidade_principal = models.TextField(blank=True)
-    protocolos_suportados = models.CharField(max_length=100)  # ex: HTTP, HTTPS
-    capacidades_dados = models.CharField(max_length=100)  # ex: JSON, XML
+    protocolos_suportados = models.CharField(max_length=100) 
+    capacidades_dados = models.CharField(max_length=100)
     email_responsavel = models.CharField(max_length=100, blank=True)
     contato_responsavel = models.CharField(max_length=100, blank=True)
     mantenedor = models.CharField(max_length=100, blank=True)
@@ -31,15 +31,15 @@ class Interface(models.Model):
     sistema = models.ForeignKey(Sistema, on_delete=models.CASCADE, related_name='interfaces')
     projeto = models.ForeignKey(Projeto, on_delete=models.CASCADE, related_name='interfaces_projeto')
     nome = models.CharField(max_length=100)
-    tipo = models.CharField(max_length=50)  # REST API, SOAP, DB, etc
+    tipo = models.CharField(max_length=50)
     endpoint = models.TextField()
-    formato_dados = models.CharField(max_length=20)  # JSON, XML, etc
+    formato_dados = models.CharField(max_length=20)  
     metodos_permitidos = models.CharField(max_length=100, blank=True)
     autenticacao = models.CharField(max_length=50, blank=True)
     operacoes_suportadas = models.TextField(blank=True)
     exemplo_dados = models.TextField(blank=True)
-    esquema = models.TextField(blank=True)  # JSON Schema ou XSD
-    throttling = models.TextField(blank=True)  # descrição livre
+    esquema = models.TextField(blank=True) 
+    throttling = models.TextField(blank=True) 
 
     def __str__(self):
         return f"{self.nome} ({self.sistema.nome})"
@@ -49,8 +49,8 @@ class EstiloIntegracao(models.Model):
     projeto = models.ForeignKey(Projeto, on_delete=models.CASCADE, related_name='estilos_integracao')
     sistema_origem = models.ForeignKey(Sistema, on_delete=models.CASCADE, related_name='integracoes_origem')
     sistema_destino = models.ForeignKey(Sistema, on_delete=models.CASCADE, related_name='integracoes_destino')
-    estilo = models.CharField(max_length=50)  # Banco Compartilhado, RPC, Mensageria, Arquivo
-    detalhes = models.JSONField(blank=True, null=True)  # Armazena os campos específicos em JSON
+    estilo = models.CharField(max_length=50)  
+    detalhes = models.JSONField(blank=True, null=True) 
 
     def __str__(self):
         return f"{self.estilo} - {self.sistema_origem.nome} → {self.sistema_destino.nome}"

@@ -21,13 +21,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 SECRET_KEY = config('SECRET_KEY')
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = False
 
 STATICFILES_DIRS = [
     BASE_DIR / "SPPOI/templates/static",
 ]
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['159.203.191.27', 'sppoitool.xyz']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 
