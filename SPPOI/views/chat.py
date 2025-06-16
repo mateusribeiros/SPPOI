@@ -117,7 +117,6 @@ def create_prompt(project, mSystems, mInterfaces, mIntegrationStyles):
             For each recommendation:
             - All suggestions must be "clearly connected to an observed point in the scenario" and not generic.
             - Provide abstract implementation examples
-            - Specify measurable KPIs for validation
             - Explain expected outcomes
         3. Point out any risks or weaknesses that could compromise future interoperability or scalability.
            - Identify interoperability/scalability threats with concrete impact scenarios
