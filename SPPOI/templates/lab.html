@@ -69,7 +69,6 @@
                         <div>
                             <h5 class="card-title">{{ x.nome }}</h5>
                             <p class="card-text">{{ x.criado_em|date:"d \d\e F \d\e Y, H:i" }}</p>
-                            <p> {{x.session_key}}</p>
                         </div>
                         <div class="d-flex gap-2 mt-3 justify-content-center flex-wrap">
                             <a class="btn btn-outline-primary btn-sm" href="{% url 'render_project' id=x.id%}"> 
