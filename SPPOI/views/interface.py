@@ -1,14 +1,20 @@
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
-from django.http import HttpResponseRedirect, JsonResponse, Http404
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from SPPOI.models import Projeto, Sistema, Interface
 
+def create_session(request):
+    if not request.session.session_key:
+        request.session.create()
+    return request.session.session_key
+
 @require_http_methods(["GET"])
 def render_interface(request, id):
     try:
-        project = get_object_or_404(Projeto, pk=id)
+        session_key = create_session(request)
+        project = get_object_or_404(Projeto, pk=id, session_key=session_key)
         mSystems = Sistema.objects.filter(projeto=project).values()
 
         return render(request, 'registerInterface.html', {
@@ -20,17 +26,17 @@ def render_interface(request, id):
         messages.error(request, f"Erro ao carregar a interface: {str(e)}")
         return redirect(reverse('render_project', kwargs={'id': id}))
 
-
 @require_http_methods(["POST"])
 def register(request, id):
     try:
-        project = get_object_or_404(Projeto, pk=id)
+        session_key = create_session(request)
+        project = get_object_or_404(Projeto, pk=id, session_key=session_key)
 
         system_id = request.POST.get('sistema_id')
         if not system_id:
             raise ValueError("Sistema não selecionado.")
 
-        system = get_object_or_404(Sistema, pk=system_id)
+        system = get_object_or_404(Sistema, pk=system_id, projeto=project)
 
         nome = request.POST.get("nome", "").strip()
         tipo = request.POST.get("tipo", "").strip()
@@ -38,7 +44,7 @@ def register(request, id):
         if not nome or not tipo:
             raise ValueError("Os campos 'nome' e 'tipo' são obrigatórios.")
 
-        interface = Interface.objects.create(
+        Interface.objects.create(
             projeto=project,
             sistema=system,
             nome=nome,
@@ -63,11 +69,11 @@ def register(request, id):
 
     return HttpResponseRedirect(reverse('render_interface', args=[id]))
 
-
 @require_http_methods(["POST"])
 def delete(request, id, idInterface):
     try:
-        project = get_object_or_404(Projeto, pk=id)
+        session_key = create_session(request)
+        project = get_object_or_404(Projeto, pk=id, session_key=session_key)
         interface = get_object_or_404(Interface, id=idInterface, projeto=project)
         interface.delete()
 
@@ -86,7 +92,8 @@ def delete(request, id, idInterface):
 
 @require_http_methods(["POST"])
 def update(request, id, idInterface):
-    project = get_object_or_404(Projeto, pk=id)
+    session_key = create_session(request)
+    project = get_object_or_404(Projeto, pk=id, session_key=session_key)
     interface = get_object_or_404(Interface, id=idInterface, projeto=project)
     mSystems = Sistema.objects.filter(projeto=project).values()
     
@@ -101,28 +108,27 @@ def update(request, id, idInterface):
 @require_http_methods(["POST"])
 def updateData(request, id, idInterface):
     try:
-        project = get_object_or_404(Projeto, pk=id)
+        session_key = create_session(request)
+        project = get_object_or_404(Projeto, pk=id, session_key=session_key)
         updateInterface = get_object_or_404(Interface, id=idInterface, projeto=project)
-
-        updateInterface.projeto = project
 
         sistema_id = request.POST.get('sistema_id')
         if not sistema_id:
             raise ValueError("Sistema não selecionado.")
 
-        sistema = get_object_or_404(Sistema, pk=sistema_id)
+        sistema = get_object_or_404(Sistema, pk=sistema_id, projeto=project)
         updateInterface.sistema = sistema
 
         updateInterface.nome = request.POST.get("nome", "").strip()
         updateInterface.tipo = request.POST.get("tipo", "").strip()
-        updateInterface.endpoint=request.POST.get("endpoint", "").strip()
-        updateInterface.formato_dados=request.POST.get("formato_dados", "").strip()
-        updateInterface.metodos_permitidos=request.POST.get("metodos_permitidos", "").strip()
-        updateInterface.esquema=request.POST.get("esquema", "").strip()
-        updateInterface.exemplo_dados=request.POST.get("exemplo_dados", "").strip()
-        updateInterface.operacoes_suportadas=request.POST.get("operacoes_suportadas", "").strip()
-        updateInterface.autenticacao=", ".join(request.POST.getlist("autenticacao[]"))
-        updateInterface.throttling=request.POST.get("throttling", "").strip()
+        updateInterface.endpoint = request.POST.get("endpoint", "").strip()
+        updateInterface.formato_dados = request.POST.get("formato_dados", "").strip()
+        updateInterface.metodos_permitidos = request.POST.get("metodos_permitidos", "").strip()
+        updateInterface.esquema = request.POST.get("esquema", "").strip()
+        updateInterface.exemplo_dados = request.POST.get("exemplo_dados", "").strip()
+        updateInterface.operacoes_suportadas = request.POST.get("operacoes_suportadas", "").strip()
+        updateInterface.autenticacao = ", ".join(request.POST.getlist("autenticacao[]"))
+        updateInterface.throttling = request.POST.get("throttling", "").strip()
 
         if not updateInterface.nome or not updateInterface.tipo:
             raise ValueError("Os campos 'nome' e 'tipo' são obrigatórios.")
@@ -141,7 +147,7 @@ def updateData(request, id, idInterface):
     except Exception as e:
         messages.error(request, f"Ocorreu um erro ao atualizar a Interface: {str(e)}")
 
-    project = get_object_or_404(Projeto, pk=id)
+    project = get_object_or_404(Projeto, pk=id, session_key=session_key)
     interface = get_object_or_404(Interface, id=idInterface, projeto=project)
     mSystems = Sistema.objects.filter(projeto=project).values()
     

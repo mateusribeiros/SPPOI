@@ -7,7 +7,7 @@ from SPPOI.models import Projeto, Sistema, EstiloIntegracao
 
 
 @require_http_methods(["GET"])
-def render_integration(request, id):
+def render_integration_form(request, id):
     try:
         project = get_object_or_404(Projeto, pk=id)
         mSystems = Sistema.objects.filter(projeto=project).values()
@@ -21,8 +21,9 @@ def render_integration(request, id):
         messages.error(request, f"Erro ao carregar a interface: {str(e)}")
         return redirect(reverse('render_project', kwargs={'id': id}))
 
+
 @require_http_methods(["POST"])
-def register(request, id):
+def create_integration(request, id):
     try:
         project = get_object_or_404(Projeto, pk=id)
 
@@ -81,7 +82,7 @@ def register(request, id):
             estilo=estilo,
             detalhes=detalhes
         )
-    
+
         messages.success(request, "Integração registrada com sucesso.")
         return redirect(reverse('render_project', kwargs={'id': id}))
 
@@ -90,7 +91,7 @@ def register(request, id):
     except Exception as e:
         messages.error(request, f"Ocorreu um erro inesperado: {str(e)}")
 
-    # Em caso de erro, recarregar a página com os dados e a mensagem
+    # Em caso de erro, recarrega o form
     mSystems = Sistema.objects.filter(projeto=project).values()
     return render(request, 'registerIntegration.html', {
         'mSystems': mSystems,
@@ -99,31 +100,30 @@ def register(request, id):
 
 
 @require_http_methods(["POST"])
-def delete(request, id, idIntegration):
+def delete_integration(request, id, idIntegration):
     try:
         project = get_object_or_404(Projeto, pk=id)
         integration = get_object_or_404(EstiloIntegracao, id=idIntegration, projeto=project)
         integration.delete()
 
-        messages.success(request, f"Estilo de Integração deletado com sucesso.")
-    
+        messages.success(request, "Estilo de Integração deletado com sucesso.")
+
     except EstiloIntegracao.DoesNotExist:
         messages.error(request, "O Estilo de Integração não foi encontrado.")
-    
     except Projeto.DoesNotExist:
         messages.error(request, "Projeto não encontrado.")
-    
     except Exception as e:
         messages.error(request, f"Ocorreu um erro ao deletar o Estilo de Integração: {str(e)}")
 
     return redirect('render_project', id=id)
 
+
 @require_http_methods(["POST"])
-def update(request, id, idIntegration):
+def render_integration_update_form(request, id, idIntegration):
     project = get_object_or_404(Projeto, pk=id)
     integration = get_object_or_404(EstiloIntegracao, id=idIntegration, projeto=project)
     mSystems = Sistema.objects.filter(projeto=project).values()
-    
+
     context = {
         'project': project,
         'integration': integration,
@@ -132,22 +132,23 @@ def update(request, id, idIntegration):
 
     return render(request, 'updateIntegration.html', context)
 
+
 @require_http_methods(["POST"])
-def updateData(request, id, idIntegration):
+def update_integration_data(request, id, idIntegration):
     try:
         project = get_object_or_404(Projeto, pk=id)
-        updateIntegration = get_object_or_404(EstiloIntegracao, id=idIntegration, projeto=project)
+        integration = get_object_or_404(EstiloIntegracao, id=idIntegration, projeto=project)
 
-        updateIntegration.sistema_origem_id = request.POST.get("sistema_origem_id")
-        updateIntegration.sistema_destino_id = request.POST.get("sistema_destino_id")
-        updateIntegration.estilo = request.POST.get("estilo", "").strip()
+        integration.sistema_origem_id = request.POST.get("sistema_origem_id")
+        integration.sistema_destino_id = request.POST.get("sistema_destino_id")
+        integration.estilo = request.POST.get("estilo", "").strip()
 
-        updateIntegration.sistema_origem = get_object_or_404(Sistema, pk=updateIntegration.sistema_origem_id)
-        updateIntegration.sistema_destino = get_object_or_404(Sistema, pk=updateIntegration.sistema_destino_id)
+        integration.sistema_origem = get_object_or_404(Sistema, pk=integration.sistema_origem_id)
+        integration.sistema_destino = get_object_or_404(Sistema, pk=integration.sistema_destino_id)
 
         detalhes = {}
 
-        if updateIntegration.estilo == "Banco Compartilhado":
+        if integration.estilo == "Banco Compartilhado":
             detalhes = {
                 "tipo_banco": request.POST.get("tipo_banco", "").strip(),
                 "host": request.POST.get("host", "").strip(),
@@ -158,19 +159,19 @@ def updateData(request, id, idIntegration):
                 "tabelas_compartilhadas": request.POST.get("tabelas_compartilhadas", "").strip(),
                 "sincronizacao": request.POST.get("sincronizacao", "").strip(),
             }
-        elif updateIntegration.estilo == "Mensageria":
+        elif integration.estilo == "Mensageria":
             detalhes = {
                 "broker": request.POST.get("broker", "").strip(),
                 "topicos_filas": request.POST.get("topicos_filas", "").strip(),
                 "formato_dados": request.POST.get("formato_dados", "").strip(),
             }
-        elif updateIntegration.estilo == "RPC":
+        elif integration.estilo == "RPC":
             detalhes = {
                 "tipo_rpc": request.POST.get("tipo_rpc", "").strip(),
                 "metodos": request.POST.get("definicoes_metodos", "").strip(),
                 "endpoint_rpc": request.POST.get("endpoint_rpc", "").strip(),
             }
-        elif updateIntegration.estilo == "Troca de Arquivos":
+        elif integration.estilo == "Troca de Arquivos":
             detalhes = {
                 "tipo_arquivo": request.POST.get("tipo_arquivo", "").strip(),
                 "protocolo_transferencia": request.POST.get("protocolo_transferencia", "").strip(),
@@ -180,9 +181,9 @@ def updateData(request, id, idIntegration):
         else:
             raise ValueError("Estilo de integração inválido ou não reconhecido.")
 
-        updateIntegration.detalhes = detalhes
-        updateIntegration.save()
-    
+        integration.detalhes = detalhes
+        integration.save()
+
         messages.success(request, "Estilo de integração atualizado com sucesso.")
         return redirect(reverse('render_project', kwargs={'id': id}))
 
@@ -195,10 +196,11 @@ def updateData(request, id, idIntegration):
     except Exception as e:
         messages.error(request, f"Ocorreu um erro ao atualizar o Estilo de Integração: {str(e)}")
 
+    # Recarrega o formulário em caso de erro
     project = get_object_or_404(Projeto, pk=id)
     integration = get_object_or_404(EstiloIntegracao, id=idIntegration, projeto=project)
     mSystems = Sistema.objects.filter(projeto=project).values()
-    
+
     context = {
         'project': project,
         'integration': integration,

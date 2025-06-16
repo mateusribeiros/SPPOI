@@ -17,7 +17,12 @@ def index(request):
 @require_http_methods(["GET"])
 def render_lab(request):
     try:
-        project = Projeto.objects.all().values()
+        if not request.session.session_key:
+            request.session.save()
+
+        session_key = request.session.session_key
+
+        project = Projeto.objects.filter(session_key=session_key).values()
 
         return render(request, 'lab.html', {
             'project': project
@@ -26,3 +31,4 @@ def render_lab(request):
     except Exception as e:
         messages.error(request, f"Erro ao carregar os projetos: {str(e)}")
         return render(request, 'lab.html', {'project': []})
+    

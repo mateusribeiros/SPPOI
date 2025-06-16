@@ -21,10 +21,19 @@ HF_TOKEN = settings.HF_API_TOKEN
 os.makedirs(DATA_PATH, exist_ok=True)
 os.makedirs(CHROMA_PATH, exist_ok=True)
 
+def get_project_for_session_or_404(request, id):
+    # Garante que a session_key exista
+    if not request.session.session_key:
+        request.session.save()
+    session_key = request.session.session_key
+
+    return get_object_or_404(Projeto, pk=id, session_key=session_key)
+
+
 @require_http_methods(["GET", "POST"])
 def render_chat(request, id):
     try:
-        project, mSystems, mInterfaces, mIntegrationStyles = get_project_data(id)
+        project, mSystems, mInterfaces, mIntegrationStyles = get_project_data(request, id)
 
         prompt = None
         ai_response = None
@@ -215,11 +224,11 @@ def prepare_chroma_db():
     db = Chroma.from_documents(chunks, embedding=embeddings, persist_directory=CHROMA_PATH)
     db.persist()	
 
-def get_project_data(project_id):
-    project = get_object_or_404(Projeto, pk=project_id)
+def get_project_data(request, project_id):
+    project = get_project_for_session_or_404(request, project_id)
+
     mSystems = Sistema.objects.filter(projeto=project).values()
     mInterfaces = Interface.objects.filter(projeto=project).values()
     mIntegrationStyles = EstiloIntegracao.objects.filter(projeto=project)
-    
-    return project, mSystems, mInterfaces, mIntegrationStyles
 
+    return project, mSystems, mInterfaces, mIntegrationStyles

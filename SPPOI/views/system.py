@@ -6,10 +6,19 @@ from django.contrib import messages
 from SPPOI.models import Projeto, Sistema
 
 
+def get_project_for_session_or_404(request, id):
+    # Garante que a session_key exista
+    if not request.session.session_key:
+        request.session.save()
+    session_key = request.session.session_key
+
+    return get_object_or_404(Projeto, pk=id, session_key=session_key)
+
+
 @require_http_methods(["GET"])
 def render_system(request, id):
     try:
-        project = get_object_or_404(Projeto, pk=id)
+        project = get_project_for_session_or_404(request, id)
 
         return render(request, 'registerSystem.html', {
             'project': project
@@ -23,7 +32,7 @@ def render_system(request, id):
 @require_http_methods(["POST"])
 def register(request, id):
     try:
-        project = get_object_or_404(Projeto, pk=id)
+        project = get_project_for_session_or_404(request, id)
 
         nome = request.POST.get('name', '').strip()
         if not nome:
@@ -53,47 +62,53 @@ def register(request, id):
     except Exception as e:
         messages.error(request, f"Ocorreu um erro inesperado ao registrar o sistema: {str(e)}")
 
-    project = get_object_or_404(Projeto, pk=id)
+    project = get_project_for_session_or_404(request, id)
     return render(request, 'registerSystem.html', {
         'project': project
     })
 
+
 @require_http_methods(["POST"])
 def delete(request, id, idSystem):
     try:
-        project = get_object_or_404(Projeto, pk=id)
+        project = get_project_for_session_or_404(request, id)
         system = get_object_or_404(Sistema, id=idSystem, projeto=project)
 
         system.delete()
         messages.success(request, f"Sistema deletado com sucesso.")
-    
+
     except Sistema.DoesNotExist:
         messages.error(request, "O sistema não foi encontrado.")
-    
     except Projeto.DoesNotExist:
         messages.error(request, "Projeto não encontrado.")
-    
     except Exception as e:
         messages.error(request, f"Ocorreu um erro ao deletar o sistema: {str(e)}")
 
     return redirect('render_project', id=id)
 
+
 @require_http_methods(["POST"])
 def update(request, id, idSystem):
-    project = get_object_or_404(Projeto, pk=id)
-    system = get_object_or_404(Sistema, id=idSystem, projeto=project)
-    
-    context = {
-        'project': project,
-        'system': system
-    }
+    try:
+        project = get_project_for_session_or_404(request, id)
+        system = get_object_or_404(Sistema, id=idSystem, projeto=project)
 
-    return render(request, 'updateSystem.html', context)
+        context = {
+            'project': project,
+            'system': system
+        }
+
+        return render(request, 'updateSystem.html', context)
+
+    except Exception as e:
+        messages.error(request, f"Erro ao carregar a página de atualização: {str(e)}")
+        return redirect(reverse('render_project', kwargs={'id': id}))
+
 
 @require_http_methods(["POST"])
 def updateData(request, id, idSystem):
     try:
-        project = get_object_or_404(Projeto, pk=id)
+        project = get_project_for_session_or_404(request, id)
         updateSystem = get_object_or_404(Sistema, id=idSystem, projeto=project)
 
         nome = request.POST.get('name', '').strip()
@@ -111,10 +126,9 @@ def updateData(request, id, idSystem):
         updateSystem.contato_responsavel = request.POST.get('responsible_phone', '').strip()
         updateSystem.mantenedor = request.POST.get('maintainer', '').strip()
         updateSystem.requisitos_autenticacao = ", ".join(request.POST.getlist('authentication_requirements[]'))
-        updateSystem.projeto = project
 
         updateSystem.save()
-    
+
         messages.success(request, "Sistema atualizado com sucesso.")
         return redirect(reverse('render_project', kwargs={'id': id}))
 
@@ -127,9 +141,9 @@ def updateData(request, id, idSystem):
     except Exception as e:
         messages.error(request, f"Ocorreu um erro ao atualizar o Sistema: {str(e)}")
 
-    project = get_object_or_404(Projeto, pk=id)
+    project = get_project_for_session_or_404(request, id)
     system = get_object_or_404(Sistema, id=idSystem, projeto=project)
-    
+
     context = {
         'project': project,
         'system': system

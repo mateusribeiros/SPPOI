@@ -14,7 +14,9 @@ def create_session(request):
 @require_http_methods(["GET"])
 def render_project(request, id):
     try:
-        project = get_object_or_404(Projeto, pk=id)
+        session_key = create_session(request)
+        project = get_object_or_404(Projeto, pk=id, session_key=session_key)
+
         mSystems = Sistema.objects.filter(projeto=project).values()
         mInterfaces = Interface.objects.filter(projeto=project).values()
         mIntegrationStyles = EstiloIntegracao.objects.filter(projeto=project)
@@ -58,10 +60,10 @@ def register_project(request):
 @require_http_methods(["POST"])
 def delete(request, id):
     try:
-        project = get_object_or_404(Projeto, pk=id)
+        session_key = create_session(request)
+        project = get_object_or_404(Projeto, pk=id, session_key=session_key)
         project.delete()
         messages.success(request, f"Projeto deletado com sucesso.")
-
     except Exception as e:
         messages.error(request, f"Ocorreu um erro ao deletar o projeto: {str(e)}")
 
@@ -70,9 +72,10 @@ def delete(request, id):
 @require_http_methods(["POST"])
 def update(request, id):
     try:
-        project = get_object_or_404(Projeto, pk=id)
-        new_name = request.POST.get("project_name", "").strip()
+        session_key = create_session(request)
+        project = get_object_or_404(Projeto, pk=id, session_key=session_key)
 
+        new_name = request.POST.get("project_name", "").strip()
         if not new_name:
             messages.error(request, "O nome do projeto é obrigatório.")
             return HttpResponseRedirect(reverse('render_lab'))
