@@ -27,10 +27,10 @@ def render_lab(request):
         project = Projeto.objects.filter(session_key=session_key)
 
         return render(request, 'lab.html', {
-            'projects': project
+            'project': project
         })
 
     except Exception as e:
         messages.error(request, f"Erro ao carregar os projetos: {str(e)}")
-        return render(request, 'lab.html', {'projects': []})
+        return render(request, 'lab.html', {'project': []})
     
