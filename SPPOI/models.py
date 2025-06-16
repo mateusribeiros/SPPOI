@@ -4,7 +4,8 @@ from django.db import models
 class Projeto(models.Model):
     nome = models.CharField(max_length=100, default="Projeto Temporário")
     criado_em = models.DateTimeField(auto_now_add=True)
-    session_key = models.CharField(max_length=100)
+    session_key = models.CharField(max_length=100, null=False, blank=False, db_index=True)
+
 
     def __str__(self):
         return f"Projeto {self.nome} - {self.session_key}"
