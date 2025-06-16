@@ -25,7 +25,6 @@ HF_API_TOKEN= config('HF_API_TOKEN')
 
 DEBUG = False
 
-
 ALLOWED_HOSTS = ['159.203.191.27', 'sppoitool.xyz','127.0.0.1']
 
 STATIC_URL = '/static/'
@@ -139,8 +138,6 @@ USE_L10N = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
