@@ -136,7 +136,6 @@ USE_TZ = True
 USE_L10N = True
 
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
@@ -147,10 +146,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Usa banco de dados para armazenar sessões
-SESSION_COOKIE_AGE = 24 * 60 * 60  # A sessão vai expirar em 24 horas
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_AGE = 24 * 60 * 60  
 
-HF_API_TOKEN= config('HF_API_TOKEN')
 SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
