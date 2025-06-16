@@ -24,10 +24,10 @@ def render_lab(request):
     try:
         session_key = create_session(request)
 
-        projects = Projeto.objects.filter(session_key=session_key)
+        project = Projeto.objects.filter(session_key=session_key)
 
         return render(request, 'lab.html', {
-            'projects': projects
+            'projects': project
         })
 
     except Exception as e:
