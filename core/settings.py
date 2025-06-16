@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from decouple import config # type: ignore
-import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,20 +20,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
-HF_API_TOKEN = os.getenv('HF_API_TOKEN')
+SECRET_KEY = config('SECRET_KEY')
+HF_API_TOKEN= config('HF_API_TOKEN')
 
 DEBUG = False
 
-STATICFILES_DIRS = [
-    BASE_DIR / "SPPOI/templates/static",
-]
 
-ALLOWED_HOSTS = ['sppoitool.xyz']
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+ALLOWED_HOSTS = ['159.203.191.27', 'sppoitool.xyz','127.0.0.1']
 
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'	
 
-# Application definition
 
 INSTALLED_APPS = [
     'SPPOI',
@@ -97,8 +93,12 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'sppoi_db',
+        'USER': 'sppoi_user',
+        'PASSWORD': 'sppoi_pass',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -136,6 +136,7 @@ USE_TZ = True
 USE_L10N = True
 
 
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
@@ -146,9 +147,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-SESSION_COOKIE_AGE = 24 * 60 * 60  
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Usa banco de dados para armazenar sessões
+SESSION_COOKIE_AGE = 24 * 60 * 60  # A sessão vai expirar em 24 horas
 
-SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
