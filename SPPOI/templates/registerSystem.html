@@ -56,8 +56,8 @@
                             <form action="{% url 'register_system' id=project.id %}" method="post" novalidate>
                             {% csrf_token %}
                                 <div class="col-md-12 mb-3">
-                                    <input class="form-control" type="text" name="name" placeholder="Nome do sistema" required>
-                                    <div class="invalid-feedback">O campo de nome não deve estar em branco!</div>
+                                    <input class="form-control" type="text" name="name" id="name" placeholder="Nome do sistema" required>
+                                    <div class="invalid-feedback">Este campo é obrigatório.</div>
                                 </div>
     
                                 <div class="col-md-12 mb-3">
@@ -88,10 +88,12 @@
                                         <option value="SIEM - Security Information and Event Management">SIEM - Security Information and Event Management</option>
                                         <option value="Outro">Outro</option>
                                     </select>
+                                    <div class="invalid-feedback">Este campo é obrigatório.</div>
                                 </div>
 
                                 <div class="col-md-12 mb-3" id="otherTypeContainer" style="display:none;">
-                                    <input type="text" name="type" id="type" class="form-control" placeholder="Descreva o tipo do sistema" required>
+                                    <input type="text" name="type" id="otherType" class="form-control" placeholder="Descreva o tipo do sistema" required>
+                                    <div class="invalid-feedback">Este campo é obrigatório.</div>
                                 </div>
                                 
                                 <div class="col-md-12 mb-3">
@@ -125,6 +127,7 @@
                                         <option value="soap">SOAP (via HTTP)</option>
                                         <option value="websockets">WebSockets</option>
                                     </select>
+                                    <div class="invalid-feedback">Este campo é obrigatório.</div>
                                 </div>
     
                                 <div class="col-md-12 mb-3">
@@ -256,6 +259,45 @@
                 document.getElementById('otherType').removeAttribute('required');
             }
         }
+        
+        document.getElementById("submit").addEventListener("click", function (event) {
+            const nome = document.getElementById("name");
+            const tipo = document.getElementById("type");
+            const outrosTipo = document.getElementById("otherType");
+            const outrosTipoContainer = document.getElementById("otherTypeContainer");
+            const protocolos = $('#protocolosSuportados').val();
+        
+            let isValid = true;
+        
+            nome.classList.remove("is-invalid");
+            tipo.classList.remove("is-invalid");
+            outrosTipo?.classList.remove("is-invalid");
+            document.getElementById("protocolosSuportados").classList.remove("is-invalid");
+        
+            if (!nome.value.trim()) {
+                nome.classList.add("is-invalid");
+                isValid = false;
+            }
+        
+            if (!tipo.value && outrosTipoContainer.style.display === 'none') {
+                tipo.classList.add("is-invalid");
+                isValid = false;
+            }
+        
+            if (outrosTipoContainer.style.display !== 'none' && !outrosTipo.value.trim()) {
+                outrosTipo.classList.add("is-invalid");
+                isValid = false;
+            }
+        
+            if (!protocolos || protocolos.length === 0) {
+                document.getElementById("protocolosSuportados").classList.add("is-invalid");
+                isValid = false;
+            }
+        
+            if (!isValid) {
+                event.preventDefault(); 
+            }
+        });
     </script>
 </body>
 </html> 
