@@ -126,6 +126,16 @@
                                         <option value="yaml" {% if "yaml" in system.capacidades_dados %}selected{% endif %}>YAML</option>
                                     </select>
                                 </div>                                
+
+                                <div class="col-md-12 mb-4">
+                                    <label for="authentication_requirements" class="form-label">Requisitos de Autenticação</label>
+                                    <select class="form-select" id="authentication_requirements" name="authentication_requirements[]" multiple required style="width: 100%">
+                                        <option value="oauth" {% if "oauth" in system.requisitos_autenticacao %}selected{% endif %}>OAuth</option>
+                                        <option value="basic_auth" {% if "basic_auth" in system.requisitos_autenticacao %}selected{% endif %}>Basic Auth</option>
+                                        <option value="api_keys" {% if "api_keys" in system.requisitos_autenticacao %}selected{% endif %}>API Keys</option>
+                                        <option value="bearer_token" {% if "bearer_token" in system.requisitos_autenticacao %}selected{% endif %}>Bearer Token</option>
+                                    </select>
+                                </div>  
                                 
                                 <div>
                                     <div class="col-md-12 mb-3">Informações do responsável</div>
@@ -142,16 +152,7 @@
                                         <input class="form-control" value="{{system.mantenedor}}" type="text" name="maintainer" placeholder="Mantenedor do sistema">
                                     </div>
                                 </div>
-                                
-                                <div class="col-md-12 mb-4">
-                                    <label for="authentication_requirements" class="form-label">Requisitos de Autenticação</label>
-                                    <select class="form-select" id="authentication_requirements" name="authentication_requirements[]" multiple required style="width: 100%">
-                                        <option value="oauth" {% if "oauth" in system.requisitos_autenticacao %}selected{% endif %}>OAuth</option>
-                                        <option value="basic_auth" {% if "basic_auth" in system.requisitos_autenticacao %}selected{% endif %}>Basic Auth</option>
-                                        <option value="api_keys" {% if "api_keys" in system.requisitos_autenticacao %}selected{% endif %}>API Keys</option>
-                                        <option value="bearer_token" {% if "bearer_token" in system.requisitos_autenticacao %}selected{% endif %}>Bearer Token</option>
-                                    </select>
-                                </div>                                
+                                                          
 
                                 <div class="d-grid">
                                     <button 
