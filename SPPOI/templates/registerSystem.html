@@ -18,6 +18,12 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+     <style>
+		.select2-container--default.is-invalid .select2-selection {
+			border-color: #dc3545 !important;
+			box-shadow: 0 0 0 0.2rem rgba(220,53,69,0.25);
+		}
+    </style>
 </head>
 <body id="page-top" class="pt-5"> 
     {% if messages %}
@@ -53,7 +59,7 @@
                             </div>
                             <h3 class="card-title mb-3 text-center">Registre</h3>
                             <p class="text-center mb-4">Preencha os campos abaixo.</p>
-                            <form action="{% url 'register_system' id=project.id %}" class="needs-validation" method="post">
+                            <form action="{% url 'register_system' id=project.id %}" method="post" novalidate>
                             {% csrf_token %}
                                 <div class="col-md-12 mb-3">
                                     <input class="form-control" type="text" name="name" placeholder="Nome do sistema" required>
@@ -91,7 +97,7 @@
                                 </div>
 
                                 <div class="col-md-12 mb-3" id="otherTypeContainer" style="display:none;">
-                                    <input type="text" name="type" id="type" class="form-control" placeholder="Descreva o tipo do sistema">
+                                    <input type="text" name="type" id="type" class="form-control" placeholder="Descreva o tipo do sistema" required>
                                 </div>
                                 
                                 <div class="col-md-12 mb-3">
@@ -188,7 +194,7 @@
                                     <div class="col-md-12 mb-3">Informações do responsável</div>
 
                                     <div class="col-md-12 mb-3">
-                                        <input class="form-control" type="email" name="responsible_mail" placeholder="E-mail" required>
+                                        <input class="form-control" type="email" name="responsible_mail" placeholder="E-mail">
                                     </div>
 
                                     <div class="col-md-12 mb-3">
@@ -256,6 +262,44 @@
                 document.getElementById('otherType').removeAttribute('required');
             }
         }
+
+        (function () {
+        	'use strict';
+        	const form = document.querySelector("form");
+        	form.addEventListener('submit', function (event) {
+        		if (!form.checkValidity()) {
+        			event.preventDefault();
+        			event.stopPropagation();
+        		}
+
+        		let isValid = true;
+
+        		const select2Fields = [
+        			'#protocolosSuportados',
+        			'#data_manipulation_format',
+        			'#authentication_requirements'
+        		];
+
+        		select2Fields.forEach(function(selector) {
+        			const select = document.querySelector(selector);
+        			const value = $(select).val();
+
+        			const wrapper = $(select).next('.select2-container');
+        			wrapper.removeClass('is-invalid');
+
+        			if (!value || value.length === 0) {
+        				isValid = false;
+        				wrapper.addClass('is-invalid');
+        			}
+        		});
+
+        		if (!isValid) {
+        			event.preventDefault();
+        			event.stopPropagation();
+        		}
+        		form.classList.add('was-validated')
+        	}, false)
+        })();
     </script>
 </body>
-</html>
+</html> 
