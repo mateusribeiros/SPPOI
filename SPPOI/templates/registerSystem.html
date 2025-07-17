@@ -97,7 +97,7 @@
                                 </div>
                                 
                                 <div class="col-md-12 mb-3">
-                                    <input class="form-control" type="text" name="version" placeholder="Versão" required>
+                                    <input class="form-control" type="text" name="version" placeholder="Versão">
                                 </div>
     
                                 <div class="col-md-12 mb-3">
@@ -160,6 +160,7 @@
                                         <option value="xml">XML</option>
                                         <option value="yaml">YAML</option>
                                     </select>
+                                    <div class="invalid-feedback">Este campo é obrigatório.</div>
                                 </div>
                                 
                                 <div class="col-md-12 mb-3">
@@ -185,6 +186,7 @@
                                         <option value="saml">SAML (Security Assertion Markup Language)</option>
                                         <option value="session_cookie">Session Cookie</option>
                                     </select>
+                                    <div class="invalid-feedback">Este campo é obrigatório.</div>
                                 </div>
 
                                 <div>
@@ -266,6 +268,9 @@
             const outrosTipo = document.getElementById("otherType");
             const outrosTipoContainer = document.getElementById("otherTypeContainer");
             const protocolos = $('#protocolosSuportados').val();
+            const data_manipulation_format = $('#data_manipulation_format').val();
+            const authentication_requirements = $('#authentication_requirements').val();
+            
         
             let isValid = true;
         
@@ -273,6 +278,8 @@
             tipo.classList.remove("is-invalid");
             outrosTipo?.classList.remove("is-invalid");
             document.getElementById("protocolosSuportados").classList.remove("is-invalid");
+            document.getElementById("data_manipulation_format").classList.remove("is-invalid");
+            document.getElementById("authentication_requirements").classList.remove("is-invalid");
         
             if (!nome.value.trim()) {
                 nome.classList.add("is-invalid");
@@ -293,7 +300,17 @@
                 document.getElementById("protocolosSuportados").classList.add("is-invalid");
                 isValid = false;
             }
-        
+
+            if (!data_manipulation_format || data_manipulation_format.length === 0) {
+                document.getElementById("data_manipulation_format").classList.add("is-invalid");
+                isValid = false;
+            }
+
+            if (!authentication_requirements || authentication_requirements.length === 0) {
+                document.getElementById("authentication_requirements").classList.add("is-invalid");
+                isValid = false;
+            }
+            
             if (!isValid) {
                 event.preventDefault(); 
             }
