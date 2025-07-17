@@ -41,7 +41,7 @@
                             </div>
                             <h3 class="card-title mb-3 text-center">Registre</h3>
                             <p class="text-center mb-4">Preencha os campos abaixo.</p>
-                            <form action="{% url 'register_integration' id=project.id %}" class="needs-validation" method="post">
+                            <form action="{% url 'register_integration' id=project.id %}" novalidate method="post">
                                 {% csrf_token %}
 
                                 {% if messages %}
@@ -57,22 +57,24 @@
                                 
                                 <div class="mb-3">
                                     <label class="form-label">Sistema de Origem</label>
-                                    <select name="sistema_origem_id" class="form-select" required>
+                                    <select name="sistema_origem_id" id="sistema_origem_id" class="form-select" required>
                                         <option selected disabled value="">Selecione o sistema de origem</option>
                                         {% for sistema in mSystems %}
                                             <option value="{{ sistema.id }}">{{ sistema.nome }}</option>
                                         {% endfor %}
                                     </select>
+                                    <div class="invalid-feedback">Este campo é obrigatório.</div>
                                 </div>
                             
                                 <div class="mb-3">
                                     <label class="form-label">Sistema de Destino</label>
-                                    <select name="sistema_destino_id" class="form-select" required>
+                                    <select name="sistema_destino_id" id="sistema_destino_id" class="form-select" required>
                                         <option selected disabled value="">Selecione o sistema de destino</option>
                                         {% for sistema in mSystems %}
                                             <option value="{{ sistema.id }}">{{ sistema.nome }}</option>
                                         {% endfor %}
                                     </select>
+                                    <div class="invalid-feedback">Este campo é obrigatório.</div>
                                 </div>
                             
                                 <div class="mb-3">
@@ -84,6 +86,7 @@
                                         <option value="RPC">RPC (Chamada de Procedimento Remoto)</option>
                                         <option value="Troca de Arquivos">Troca de Arquivos</option>
                                     </select>
+                                    <div class="invalid-feedback">Este campo é obrigatório.</div>
                                 </div>
                             
                                 <div id="camposBanco" style="display: none;">
@@ -244,6 +247,32 @@
                 dropdownAutoWidth: true,
                 width: 'resolve'
             });
+        });
+
+        document.getElementById("submit").addEventListener("click", function (event) {
+            const sistema_destino_id = $('#sistema_destino_id').val();
+            const sistema_origem_id = $('#sistema_origem_id').val();
+            const estiloSelect = $('#estiloSelect').val();
+    
+            let isValid = true;
+        
+            sistema_destino_id.getElementById("protocolosSuportados").classList.remove("is-invalid");
+            sistema_origem_id.getElementById("data_manipulation_format").classList.remove("is-invalid");
+            estiloSelect.getElementById("authentication_requirements").classList.remove("is-invalid");
+        
+            if (!sistema_destino_id || sistema_destino_id.length === 0) {
+                document.getElementById("sistema_destino_id").classList.add("is-invalid");
+                isValid = false;
+            }
+
+            if (!estiloSelect || estiloSelect.length === 0) {
+                document.getElementById("estiloSelect").classList.add("is-invalid");
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                event.preventDefault(); 
+            }
         });
     </script>
 </body>
