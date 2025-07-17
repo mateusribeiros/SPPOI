@@ -1,205 +1,207 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="" />
-    <meta name="author" content="" />
     <title>Edição de Sistema</title>
-    <link rel="icon" type="image/x-icon" href="{% static 'bootstrap/assets/logo.png' %}" />
+    <link rel="icon" href="{% static 'bootstrap/assets/logo.png' %}" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,600;1,600&amp;display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300;0,500;0,600;0,700;1,300;1,500;1,600;1,700&amp;display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;1,400&amp;display=swap" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link href="{% static 'bootstrap/css/styles.css'%}" rel="stylesheet" /> 
-
+    <link href="{% static 'bootstrap/css/styles.css'%}" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </head>
-<body id="page-top" class="pt-5"> 
-    {% if messages %}
-    <div class="container mt-4">
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
+<body class="pt-5">
+
+<nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
+    <div class="container px-5">
+        <a class="navbar-brand fw-bold" href="{% url 'render_lab' %}">SPPOI Tool</a>
     </div>
-    {% endif %}
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
-        <div class="container px-5">
-            <a class="navbar-brand fw-bold" href="{% url 'render_lab' %}">SPPOI Tool</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-                Menu
-                <i class="bi-list"></i>
-            </button>
-        </div>
-    </nav>
-    <header class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
-        <div class="container w-75">
-            <div class="row justify-content-center">
-                <div class="col-12">
-                    <div class="card shadow p-4">
-                        <div class="card-body">
-                            <div class="container">
-                                <button class="btn btn-primary btn-voltar mb-4" onclick="window.history.back()" style="background-color: #124559;">
-                                    <i class="bi bi-arrow-left"></i> Voltar
-                                </button>
-                            </div>
-                            <h3 class="card-title mb-3 text-center">Atualize os dados</h3>
-                            <p class="text-center mb-4">Modifique os campos abaixo.</p>
-                            <form action="{% url 'update_systemData' id=project.id idSystem=system.id%}" class="needs-validation" method="post">
-                            {% csrf_token %}
+</nav>
 
-                                <div class="col-md-12 mb-3">
-                                    <input class="form-control" type="text" value="{{system.nome}}" name="name" placeholder="Nome do sistema" required>
-                                </div>
-    
-                                <div class="col-md-12 mb-3">
-                                    <textarea class="form-control" name="description" value="{{system.descricao}}" placeholder="Descrição" rows="4" cols="50">{{system.descricao}}</textarea>
-                                </div>
-    
-                                <div class="col-md-12 mb-3">
-                                    <select name="type" class="form-select" required>
-                                        <option selected value="{{system.tipo}}">{{system.tipo}}</option>
+<header class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+    <div class="container w-75">
+        <div class="card shadow p-4">
+            <div class="card-body">
+                <button class="btn btn-primary btn-voltar mb-4" onclick="window.history.back()" style="background-color: #124559;">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </button>
+                <h3 class="card-title mb-3 text-center">Atualize os dados</h3>
+                <form action="{% url 'update_systemData' id=project.id idSystem=system.id %}" method="post" novalidate>
+                    {% csrf_token %}
 
-                                        {% if system.tipo != "BI - Business Intelligence" %}
-                                        <option value="BI - Business Intelligence">BI - Business Intelligence</option>
-                                        {% endif %}
-
-                                        {% if system.tipo != "CRM - Customer Relationship Management" %}
-                                        <option value="CRM - Customer Relationship Management">CRM - Customer Relationship Management</option>
-                                        {% endif %}
-
-                                        {% if system.tipo != "ERP - Enterprise Resource Planning" %}
-                                        <option value="ERP - Enterprise Resource Planning">ERP - Enterprise Resource Planning</option>
-                                        {% endif %}
-
-                                        {% if system.tipo != "Gateway de pagamentos" %}
-                                        <option value="Gateway de pagamentos">Gateway de pagamentos</option>
-                                        {% endif %}
-
-                                        {% if system.tipo != "SCM - Supply Chain Management" %}
-                                        <option value="SCM - Supply Chain Management">SCM - Supply Chain Management</option>
-                                        {% endif %}
-
-                                        {% if system.tipo != "WMS - Warehouse Management System" %}
-                                        <option value="WMS - Warehouse Management System">WMS - Warehouse Management System</option>
-                                        {% endif %}
-                                    </select>
-                            
-                                </div>
-                                
-                                <div class="col-md-12 mb-3">
-                                    <input class="form-control" type="text" value="{{system.versao}}" name="version" placeholder="Versão" required>
-                                </div>
-    
-                                <div class="col-md-12 mb-3">
-                                    <textarea class="form-control" value="{{system.funcionalidade_principal}}" name="main_funcionality" placeholder="Funcionalidade principal" rows="4" cols="50">{{system.funcionalidade_principal}}</textarea>
-                                </div>
-    
-                                <div class="col-md-12 mb-3">
-                                    <label for="protocolosSuportados" class="form-label">Protocolos Suportados</label>
-                                    <select class="form-select" id="protocolosSuportados" name="protocolos[]" multiple required style="width: 100%">
-                                        <option value="http" {% if "http" in system.protocolos_suportados %}selected{% endif %}>HTTP</option>
-                                        <option value="https" {% if "https" in system.protocolos_suportados %}selected{% endif %}>HTTPS</option>
-                                        <option value="soap" {% if "soap" in system.protocolos_suportados %}selected{% endif %}>SOAP (via HTTP)</option>
-                                        <option value="amqp" {% if "amqp" in system.protocolos_suportados %}selected{% endif %}>AMQP</option>
-                                        <option value="mqtt" {% if "mqtt" in system.protocolos_suportados %}selected{% endif %}>MQTT</option>
-                                        <option value="websockets" {% if "websockets" in system.protocolos_suportados %}selected{% endif %}>WebSockets</option>
-                                        <option value="sftp" {% if "sftp" in system.protocolos_suportados %}selected{% endif %}>SFTP</option>
-                                        <option value="grpc" {% if "grpc" in system.protocolos_suportados %}selected{% endif %}>gRPC</option>
-                                        <option value="odata" {% if "odata" in system.protocolos_suportados %}selected{% endif %}>OData</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="col-md-12 mb-4">
-                                    <label for="data_manipulation_format" class="form-label">Capacidades de manipulação de dados</label>
-                                    <select class="form-select" id="data_manipulation_format" name="data_manipulation_format[]" multiple required style="width: 100%">
-                                        <option value="json" {% if "json" in system.capacidades_dados %}selected{% endif %}>JSON</option>
-                                        <option value="xml" {% if "xml" in system.capacidades_dados %}selected{% endif %}>XML</option>
-                                        <option value="csv" {% if "csv" in system.capacidades_dados %}selected{% endif %}>CSV</option>
-                                        <option value="yaml" {% if "yaml" in system.capacidades_dados %}selected{% endif %}>YAML</option>
-                                    </select>
-                                </div>                                
-
-                                <div class="col-md-12 mb-4">
-                                    <label for="authentication_requirements" class="form-label">Requisitos de Autenticação</label>
-                                    <select class="form-select" id="authentication_requirements" name="authentication_requirements[]" multiple required style="width: 100%">
-                                        <option value="oauth" {% if "oauth" in system.requisitos_autenticacao %}selected{% endif %}>OAuth</option>
-                                        <option value="basic_auth" {% if "basic_auth" in system.requisitos_autenticacao %}selected{% endif %}>Basic Auth</option>
-                                        <option value="api_keys" {% if "api_keys" in system.requisitos_autenticacao %}selected{% endif %}>API Keys</option>
-                                        <option value="bearer_token" {% if "bearer_token" in system.requisitos_autenticacao %}selected{% endif %}>Bearer Token</option>
-                                    </select>
-                                </div>  
-                                
-                                <div>
-                                    <div class="col-md-12 mb-3">Informações do responsável</div>
-
-                                    <div class="col-md-12 mb-3">
-                                        <input class="form-control" value="{{system.email_responsavel}}" type="email" name="responsible_mail" placeholder="E-mail" required>
-                                    </div>
-
-                                    <div class="col-md-12 mb-3">
-                                        <input class="form-control" value="{{system.contato_responsavel}}" type="tel" name="responsible_phone" placeholder="Telefone">
-                                    </div>
-
-                                    <div class="col-md-12 mb-3">
-                                        <input class="form-control" value="{{system.mantenedor}}" type="text" name="maintainer" placeholder="Mantenedor do sistema">
-                                    </div>
-                                </div>
-                                                          
-
-                                <div class="d-grid">
-                                    <button 
-                                        value="create_system"
-                                        id="submit" 
-                                        type="submit" 
-                                        class="btn btn-lg rounded-pill text-white px-4" 
-                                        value="update"
-                                        style="background-color: #124559;">
-                                        Editar Sistema
-                                    </button>
-                                </div>
-                            
-                            </form>
-                        </div>
+                    <!-- Nome -->
+                    <div class="col-md-12 mb-3">
+                        <input type="text" id="name" name="name" class="form-control" placeholder="Nome do sistema" value="{{ system.nome }}" required>
+                        <div class="invalid-feedback">Este campo é obrigatório.</div>
                     </div>
-                </div>
+
+                    <!-- Descrição -->
+                    <div class="col-md-12 mb-3">
+                        <textarea name="description" class="form-control" placeholder="Descrição">{{ system.descricao }}</textarea>
+                    </div>
+
+                    <!-- Tipo -->
+                    <div class="col-md-12 mb-3">
+                        <select name="type" id="type" class="form-select" required onchange="toggleOtherField(this)">
+                            <option value="">Tipo de sistema</option>
+                            {% for tipo in tipos %}
+                                <option value="{{ tipo }}" {% if system.tipo == tipo %}selected{% endif %}>{{ tipo }}</option>
+                            {% endfor %}
+                            <option value="Outro" {% if system.tipo_personalizado %}selected{% endif %}>Outro</option>
+                        </select>
+                        <div class="invalid-feedback">Este campo é obrigatório.</div>
+                    </div>
+
+                    <!-- Outro tipo -->
+                    <div class="col-md-12 mb-3" id="otherTypeContainer" style="{% if not system.tipo_personalizado %}display:none;{% endif %}">
+                        <input type="text" name="other_type" id="otherType" class="form-control" placeholder="Descreva o tipo do sistema" value="{{ system.tipo_personalizado }}">
+                        <div class="invalid-feedback">Este campo é obrigatório.</div>
+                    </div>
+
+                    <!-- Versão -->
+                    <div class="col-md-12 mb-3">
+                        <input type="text" name="version" class="form-control" placeholder="Versão" value="{{ system.versao }}">
+                    </div>
+
+                    <!-- Funcionalidade principal -->
+                    <div class="col-md-12 mb-3">
+                        <textarea name="main_funcionality" class="form-control" placeholder="Funcionalidade principal">{{ system.funcionalidade_principal }}</textarea>
+                    </div>
+
+                    <!-- Protocolos suportados -->
+                    <div class="col-md-12 mb-3">
+                        <label for="protocolosSuportados" class="form-label">Protocolos suportados</label>
+                        <select id="protocolosSuportados" name="protocolos[]" class="form-select" multiple required style="width:100%">
+                            {% for protocolo in protocolos %}
+                                <option value="{{ protocolo }}" {% if protocolo in system.protocolos_suportados %}selected{% endif %}>{{ protocolo }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">Este campo é obrigatório.</div>
+                    </div>
+
+                    <!-- Manipulação de dados -->
+                    <div class="col-md-12 mb-3">
+                        <label for="data_manipulation_format" class="form-label">Capacidades de manipulação de dados</label>
+                        <select id="data_manipulation_format" name="data_manipulation_format[]" class="form-select" multiple required style="width:100%">
+                            {% for formato in formatos_dados %}
+                                <option value="{{ formato }}" {% if formato in system.capacidades_dados %}selected{% endif %}>{{ formato }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">Este campo é obrigatório.</div>
+                    </div>
+
+                    <!-- Autenticação -->
+                    <div class="col-md-12 mb-3">
+                        <label for="authentication_requirements" class="form-label">Requisitos de autenticação</label>
+                        <select id="authentication_requirements" name="authentication_requirements[]" class="form-select" multiple required style="width:100%">
+                            {% for item in requisitos_autenticacao %}
+                                <option value="{{ item }}" {% if item in system.requisitos_autenticacao %}selected{% endif %}>{{ item }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">Este campo é obrigatório.</div>
+                    </div>
+
+                    <!-- Responsável -->
+                    <div class="col-md-12 mb-3">
+                        <input type="email" name="responsible_mail" class="form-control" placeholder="E-mail" value="{{ system.email_responsavel }}">
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <input type="tel" name="responsible_phone" class="form-control" placeholder="Telefone" value="{{ system.contato_responsavel }}">
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <input type="text" name="maintainer" class="form-control" placeholder="Mantenedor do sistema" value="{{ system.mantenedor }}">
+                    </div>
+
+                    <!-- Botão -->
+                    <div class="d-grid">
+                        <button id="submit" type="submit" class="btn btn-lg rounded-pill text-white px-4" style="background-color: #124559;">Atualizar Sistema</button>
+                    </div>
+
+                </form>
             </div>
         </div>
-    </header>    
-    <footer class="bg-black text-center py-5">
-        <div class="container px-5">
-            <div class="text-white-50 small">
-                <div class="mb-2">&copy; UFG - SPPOI Tool 2025. Todos os direitos reservados.</div>
-                <a href="#!">Privacidade</a>
-                <span class="mx-1">&middot;</span>
-                <a href="#!">Termos</a>
-            </div>
+    </div>
+</header>
+
+<footer class="bg-black text-center py-5">
+    <div class="container px-5">
+        <div class="text-white-50 small">
+            <div class="mb-2">&copy; UFG - SPPOI Tool 2025. Todos os direitos reservados.</div>
         </div>
-    </footer>
-    <script src="{% static 'bootstrap/js/registerSystem.js'%}"></script>
-    <script>
-        $('#protocolosSuportados').select2({
-            placeholder: "Selecione os protocolos suportados",
-            dropdownAutoWidth: true,
-            width: 'resolve'
-        });
-        $('#data_manipulation_format').select2({
-            placeholder: "Selecione os formatos suportados",
-            dropdownAutoWidth: true,
-            width: 'resolve'
-        });
-        $('#authentication_requirements').select2({
-            placeholder: "Selecione os requisitos suportados",
-            dropdownAutoWidth: true,
-            width: 'resolve'
-        });
-    </script>
+    </div>
+</footer>
+
+<script>
+    $('#protocolosSuportados, #data_manipulation_format, #authentication_requirements').select2({
+        dropdownAutoWidth: true,
+        width: 'resolve'
+    });
+
+    function toggleOtherField(select) {
+        const otherField = document.getElementById('otherTypeContainer');
+        if (select.value === "Outro") {
+            otherField.style.display = 'block';
+            document.getElementById('otherType').setAttribute('required', 'required');
+        } else {
+            otherField.style.display = 'none';
+            document.getElementById('otherType').removeAttribute('required');
+        }
+    }
+
+    document.getElementById("submit").addEventListener("click", function (event) {
+        const nome = document.getElementById("name");
+        const tipo = document.getElementById("type");
+        const outrosTipo = document.getElementById("otherType");
+        const outrosTipoContainer = document.getElementById("otherTypeContainer");
+        const protocolos = $('#protocolosSuportados').val();
+        const formatos = $('#data_manipulation_format').val();
+        const autenticacoes = $('#authentication_requirements').val();
+
+        let isValid = true;
+
+        nome.classList.remove("is-invalid");
+        tipo.classList.remove("is-invalid");
+        outrosTipo?.classList.remove("is-invalid");
+        document.getElementById("protocolosSuportados").classList.remove("is-invalid");
+        document.getElementById("data_manipulation_format").classList.remove("is-invalid");
+        document.getElementById("authentication_requirements").classList.remove("is-invalid");
+
+        if (!nome.value.trim()) {
+            nome.classList.add("is-invalid");
+            isValid = false;
+        }
+
+        if (!tipo.value && outrosTipoContainer.style.display === 'none') {
+            tipo.classList.add("is-invalid");
+            isValid = false;
+        }
+
+        if (outrosTipoContainer.style.display !== 'none' && !outrosTipo.value.trim()) {
+            outrosTipo.classList.add("is-invalid");
+            isValid = false;
+        }
+
+        if (!protocolos || protocolos.length === 0) {
+            document.getElementById("protocolosSuportados").classList.add("is-invalid");
+            isValid = false;
+        }
+
+        if (!formatos || formatos.length === 0) {
+            document.getElementById("data_manipulation_format").classList.add("is-invalid");
+            isValid = false;
+        }
+
+        if (!autenticacoes || autenticacoes.length === 0) {
+            document.getElementById("authentication_requirements").classList.add("is-invalid");
+            isValid = false;
+        }
+
+        if (!isValid) event.preventDefault();
+    });
+</script>
 </body>
 </html>
