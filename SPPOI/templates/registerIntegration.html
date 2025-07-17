@@ -256,10 +256,15 @@
     
             let isValid = true;
         
-            sistema_destino_id.getElementById("protocolosSuportados").classList.remove("is-invalid");
-            sistema_origem_id.getElementById("data_manipulation_format").classList.remove("is-invalid");
-            estiloSelect.getElementById("authentication_requirements").classList.remove("is-invalid");
-        
+            sistema_destino_id.getElementById("sistema_destino_id").classList.remove("is-invalid");
+            sistema_origem_id.getElementById("sistema_origem_id").classList.remove("is-invalid");
+            estiloSelect.getElementById("estiloSelect").classList.remove("is-invalid");
+
+            if (!sistema_origem_id || sistema_origem_id.length === 0) {
+                document.getElementById("sistema_origem_id").classList.add("is-invalid");
+                isValid = false;
+            }
+            
             if (!sistema_destino_id || sistema_destino_id.length === 0) {
                 document.getElementById("sistema_destino_id").classList.add("is-invalid");
                 isValid = false;
