@@ -73,6 +73,7 @@
 
                                 <div class="col-md-12 mb-3">
                                     <input class="form-control" type="text" name="nome" id="nome" placeholder="Nome da Interface" required>
+                                    <div class="invalid-feedback">Este campo é obrigatório.</div>
                                 </div>
 
                                 <div class="col-md-12 mb-3">
@@ -93,10 +94,12 @@
                                             <option value="WebSocket">WebSocket</option>
                                             <option value="Outro">Outro</option>
                                     </select>
+                                    <div class="invalid-feedback">Este campo é obrigatório.</div>
                                 </div>
 
                                 <div class="col-md-12 mb-3" id="otherTypeContainer" style="display:none;">
                                     <input type="text" name="othertype" id="othertype" class="form-control" placeholder="Descreva o tipo da interface">
+                                    <div class="invalid-feedback">Este campo é obrigatório.</div>
                                 </div>
 
                                 <div class="col-md-12 mb-3">
@@ -116,6 +119,7 @@
                                         <option value="XML">XML</option>
                                         <option value="YAML">YAML</option>
                                     </select>
+                                    <div class="invalid-feedback">Este campo é obrigatório.</div>
                                 </div>
 
                                 <div id="camposJSON_XML" style="display: none;">
@@ -162,6 +166,7 @@
                                         <option value="saml">SAML (Security Assertion Markup Language)</option>
                                         <option value="session_cookie">Session Cookie</option>
                                     </select>
+                                    <div class="invalid-feedback">Este campo é obrigatório.</div>
                                 </div>
 
                                 <div class="col-md-12 mb-3">
@@ -233,46 +238,51 @@
             }
         });
 
-        (function () {
-            'use strict';
+        document.getElementById("submit").addEventListener("click", function (event) {
+            const nome = document.getElementById("nome");
+            const tipo = document.getElementById("tipo");
+            const outrosTipo = document.getElementById("otherType");
+            const outrosTipoContainer = document.getElementById("otherTypeContainer");
+            const formatoDados = $('#formatoDados').val();
+            const autenticacao = $('#autenticacao').val();
+        
+            let isValid = true;
+        
+            nome.classList.remove("is-invalid");
+            tipo.classList.remove("is-invalid");
+            outrosTipo?.classList.remove("is-invalid");
+            document.getElementById("formatoDados").classList.remove("is-invalid");
+            document.getElementById("autenticacao").classList.remove("is-invalid");
+        
+            if (!nome.value.trim()) {
+                nome.classList.add("is-invalid");
+                isValid = false;
+            }
+        
+            if (!tipo.value && outrosTipoContainer.style.display === 'none') {
+                tipo.classList.add("is-invalid");
+                isValid = false;
+            }
+        
+            if (outrosTipoContainer.style.display !== 'none' && !outrosTipo.value.trim()) {
+                outrosTipo.classList.add("is-invalid");
+                isValid = false;
+            }
+        
+            if (!formatoDados || formatoDados.length === 0) {
+                document.getElementById("formatoDados").classList.add("is-invalid");
+                isValid = false;
+            }
+
+            if (!autenticacao || autenticacao.length === 0) {
+                document.getElementById("autenticacao").classList.add("is-invalid");
+                isValid = false;
+            }
             
-            const form = document.querySelector("form");
-
-            form.addEventListener('submit', function (event) {
-                if (!form.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-                }
-
-                let isValid = true;
-
-                const select2Fields = [
-                '#protocolosSuportados',
-                '#data_manipulation_format',
-                '#authentication_requirements'
-                ];
-
-                select2Fields.forEach(function(selector) {
-                const select = document.querySelector(selector);
-                const value = $(select).val(); 
-
-                const wrapper = $(select).next('.select2-container');
-                wrapper.removeClass('is-invalid');
-
-                if (!value || value.length === 0) {
-                    isValid = false;
-                    wrapper.addClass('is-invalid'); 
-                }
-                });
-
-                if (!isValid) {
-                event.preventDefault();
-                event.stopPropagation();
-                }
-
-                form.classList.add('was-validated');
-            }, false);
-            })();        
+            if (!isValid) {
+                event.preventDefault(); 
+            }
+        });
     </script>
 </body>
 </html>
