@@ -152,7 +152,6 @@
                         <div>
                             <h5 class="card-title">{{ x.sistema_origem}} > {{ x.sistema_destino }}</h5>
                             <p class="card-text">{{ x.estilo }}</p>
-                            <p class="card-text">{{ x.detalhes}}</p>
                         </div>
                         <div class="d-flex justify-content-between align-items-center mt-3">
                             <form method="POST" action="{% url 'update_integration' id=project.id idIntegration=x.id %}" style="display: inline;">
