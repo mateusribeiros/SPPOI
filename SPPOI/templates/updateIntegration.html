@@ -58,7 +58,7 @@
                                  
                                 <div class="mb-3">
                                     <label class="form-label">Sistema de Origem</label>
-                                    <select name="sistema_origem_id" class="form-select" required>
+                                    <select name="sistema_origem_id" id="sistema_origem_id" class="form-select" required>
                                         <option selected value="{{ integration.sistema_origem.id }}">{{ integration.sistema_origem.nome }}</option>
                                         {% for sistema in mSystems %}
                                             {% if sistema.nome != integration.sistema_origem.nome %}
@@ -66,11 +66,12 @@
                                             {% endif %}
                                         {% endfor %}
                                     </select>
+                                    <div class="invalid-feedback">Este campo é obrigatório.</div>
                                 </div>                                
                             
                                 <div class="mb-3">
                                     <label class="form-label">Sistema de Destino</label>
-                                    <select name="sistema_destino_id" class="form-select" required>
+                                    <select name="sistema_destino_id" id="sistema_destino_id" class="form-select" required>
                                         <option selected value="{{ integration.sistema_destino.id }}">{{ integration.sistema_destino.nome}}</option>
                                         {% for sistema in mSystems %}
                                             {% if sistema.id != integration.sistema_destino.id %}
@@ -78,6 +79,7 @@
                                             {% endif %}
                                         {% endfor %}
                                     </select>
+                                    <div class="invalid-feedback">Este campo é obrigatório.</div>
                                 </div>
                             
                                 <div class="mb-3">
@@ -286,6 +288,30 @@
                 dropdownAutoWidth: true,
                 width: 'resolve'
             });
+        });
+
+        document.getElementById("submit").addEventListener("click", function (event) {
+            const sistema_destino_id = $('#sistema_destino_id').val();
+            const sistema_origem_id = $('#sistema_origem_id').val();
+    
+            let isValid = true;
+        
+            sistema_destino_id.getElementById("sistema_destino_id").classList.remove("is-invalid");
+            sistema_origem_id.getElementById("sistema_origem_id").classList.remove("is-invalid");
+        
+            if (!sistema_destino_id || sistema_destino_id.length === 0) {
+                document.getElementById("sistema_destino_id").classList.add("is-invalid");
+                isValid = false;
+            }
+
+            if (!sistema_origem_id || sistema_origem_id.length === 0) {
+                document.getElementById("sistema_origem_id").classList.add("is-invalid");
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                event.preventDefault(); 
+            }
         });
     </script>
 </body>
