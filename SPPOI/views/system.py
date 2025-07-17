@@ -35,22 +35,39 @@ def register(request, id):
         project = get_project_for_session_or_404(request, id)
 
         nome = request.POST.get('name', '').strip()
+        tipo = request.POST.get('type', '').strip()
+        versao = request.POST.get('version', '').strip()
+        protocolos = request.POST.getlist('protocolos[]')
+        formatos = request.POST.getlist('data_manipulation_format[]')
+        autenticacoes = request.POST.getlist('authentication_requirements[]')
+
+        # Validações obrigatórias
         if not nome:
             raise ValueError("O nome do sistema é obrigatório.")
+        if not tipo:
+            raise ValueError("O tipo do sistema é obrigatório.")
+        if not versao:
+            raise ValueError("A versão do sistema é obrigatória.")
+        if not protocolos:
+            raise ValueError("É necessário informar pelo menos um protocolo suportado.")
+        if not formatos:
+            raise ValueError("É necessário informar pelo menos um formato de manipulação de dados.")
+        if not autenticacoes:
+            raise ValueError("É necessário informar pelo menos um requisito de autenticação.")
 
         data = {
             "projeto": project,
             "nome": nome,
             "descricao": request.POST.get('description', '').strip(),
-            "tipo": request.POST.get('type', '').strip(),
-            "versao": request.POST.get('version', '').strip(),
+            "tipo": tipo,
+            "versao": versao,
             "funcionalidade_principal": request.POST.get('main_funcionality', '').strip(),
-            "protocolos_suportados": ", ".join(request.POST.getlist('protocolos[]')),
-            "capacidades_dados": ", ".join(request.POST.getlist('data_manipulation_format[]')),
+            "protocolos_suportados": ", ".join(protocolos),
+            "capacidades_dados": ", ".join(formatos),
             "email_responsavel": request.POST.get('responsible_mail', '').strip(),
             "contato_responsavel": request.POST.get('responsible_phone', '').strip(),
             "mantenedor": request.POST.get('maintainer', '').strip(),
-            "requisitos_autenticacao": ", ".join(request.POST.getlist('authentication_requirements[]'))
+            "requisitos_autenticacao": ", ".join(autenticacoes)
         }
 
         Sistema.objects.create(**data)
@@ -112,41 +129,51 @@ def updateData(request, id, idSystem):
         updateSystem = get_object_or_404(Sistema, id=idSystem, projeto=project)
 
         nome = request.POST.get('name', '').strip()
+        tipo = request.POST.get('type', '').strip()
+        versao = request.POST.get('version', '').strip()
+        protocolos = request.POST.getlist('protocolos[]')
+        formatos = request.POST.getlist('data_manipulation_format[]')
+        autenticacoes = request.POST.getlist('authentication_requirements[]')
+
         if not nome:
             raise ValueError("O nome do sistema é obrigatório.")
+        if not tipo:
+            raise ValueError("O tipo do sistema é obrigatório.")
+        if not versao:
+            raise ValueError("A versão do sistema é obrigatória.")
+        if not protocolos:
+            raise ValueError("É necessário informar pelo menos um protocolo suportado.")
+        if not formatos:
+            raise ValueError("É necessário informar pelo menos um formato de manipulação de dados.")
+        if not autenticacoes:
+            raise ValueError("É necessário informar pelo menos um requisito de autenticação.")
 
         updateSystem.nome = nome
         updateSystem.descricao = request.POST.get('description', '').strip()
-        updateSystem.tipo = request.POST.get('type', '').strip()
-        updateSystem.versao = request.POST.get('version', '').strip()
+        updateSystem.tipo = tipo
+        updateSystem.versao = versao
         updateSystem.funcionalidade_principal = request.POST.get('main_funcionality', '').strip()
-        updateSystem.protocolos_suportados = ", ".join(request.POST.getlist('protocolos[]'))
-        updateSystem.capacidades_dados = ", ".join(request.POST.getlist('data_manipulation_format[]'))
+        updateSystem.protocolos_suportados = ", ".join(protocolos)
+        updateSystem.capacidades_dados = ", ".join(formatos)
         updateSystem.email_responsavel = request.POST.get('responsible_mail', '').strip()
         updateSystem.contato_responsavel = request.POST.get('responsible_phone', '').strip()
         updateSystem.mantenedor = request.POST.get('maintainer', '').strip()
-        updateSystem.requisitos_autenticacao = ", ".join(request.POST.getlist('authentication_requirements[]'))
+        updateSystem.requisitos_autenticacao = ", ".join(autenticacoes)
 
         updateSystem.save()
-
         messages.success(request, "Sistema atualizado com sucesso.")
         return redirect(reverse('render_project', kwargs={'id': id}))
 
     except ValueError as ve:
         messages.error(request, str(ve))
-    except Sistema.DoesNotExist:
-        messages.error(request, "O sistema não foi encontrado.")
-    except Projeto.DoesNotExist:
-        messages.error(request, "Projeto não encontrado.")
     except Exception as e:
-        messages.error(request, f"Ocorreu um erro ao atualizar o Sistema: {str(e)}")
+        messages.error(request, f"Ocorreu um erro ao atualizar o sistema: {str(e)}")
 
     project = get_project_for_session_or_404(request, id)
     system = get_object_or_404(Sistema, id=idSystem, projeto=project)
 
-    context = {
+    return render(request, 'updateSystem.html', {
         'project': project,
         'system': system
-    }
+    })
 
-    return render(request, 'updateSystem.html', context)
