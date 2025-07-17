@@ -18,12 +18,6 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-     <style>
-		.select2-container--default.is-invalid .select2-selection {
-			border-color: #dc3545 !important;
-			box-shadow: 0 0 0 0.2rem rgba(220,53,69,0.25);
-		}
-    </style>
 </head>
 <body id="page-top" class="pt-5"> 
     {% if messages %}
@@ -262,44 +256,6 @@
                 document.getElementById('otherType').removeAttribute('required');
             }
         }
-
-        (function () {
-        	'use strict';
-        	const form = document.querySelector("form");
-        	form.addEventListener('submit', function (event) {
-        		if (!form.checkValidity()) {
-        			event.preventDefault();
-        			event.stopPropagation();
-        		}
-
-        		let isValid = true;
-
-        		const select2Fields = [
-        			'#protocolosSuportados',
-        			'#data_manipulation_format',
-        			'#authentication_requirements'
-        		];
-
-        		select2Fields.forEach(function(selector) {
-        			const select = document.querySelector(selector);
-        			const value = $(select).val();
-
-        			const wrapper = $(select).next('.select2-container');
-        			wrapper.removeClass('is-invalid');
-
-        			if (!value || value.length === 0) {
-        				isValid = false;
-        				wrapper.addClass('is-invalid');
-        			}
-        		});
-
-        		if (!isValid) {
-        			event.preventDefault();
-        			event.stopPropagation();
-        		}
-        		form.classList.add('was-validated')
-        	}, false)
-        })();
     </script>
 </body>
 </html> 
