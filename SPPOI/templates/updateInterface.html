@@ -52,7 +52,7 @@
                             </div>
                             <h3 class="card-title mb-3 text-center">Atualize os dados</h3>
                             <p class="text-center mb-4">Modifique os campos abaixo.</p>
-                            <form action="{% url 'update_interfaceData' id=project.id idInterface=interface.id %}" class="needs-validation" method="post">
+                            <form action="{% url 'update_interfaceData' id=project.id idInterface=interface.id %}" novalidate method="post">
                             {% csrf_token %}
                                 <div class="col-md-12 mb-3">
                                     <label for="sistemaSelect" class="form-label">Selecione um Sistema</label>
@@ -67,44 +67,125 @@
                                 </div>
 
                                 <div class="col-md-12 mb-3">
-                                    <input class="form-control" type="text" name="nome" value="{{interface.nome}}" placeholder="Nome da Interface" required>
+                                    <input class="form-control" type="text" name="nome" id="nome" value="{{interface.nome}}" placeholder="Nome da Interface" required>
+                                    <div class="invalid-feedback">Este campo é obrigatório.</div>
                                 </div>
 
                                 <div class="col-md-12 mb-3">
-                                    <select name="tipo" class="form-select" required>
-                                        <option selected value="{{interface.tipo}}">{{interface.tipo}}</option>
-
-                                        {% if interface.tipo != "REST API" %}
-                                        <option value="REST API">REST API</option>
+                                    <select name="tipo" id="tipo" class="form-select" required>
+                                        <option selected value="{{ interface.tipo }}">{{ interface.tipo }}</option>
+                                
+                                        {% if interface.tipo != "AMQP" %}
+                                        <option value="AMQP">AMQP</option>
                                         {% endif %}
-
-                                        {% if interface.tipo != "SOAP" %}
-                                        <option value="SOAP">SOAP</option>
+                                
+                                        {% if interface.tipo != "CLI" %}
+                                        <option value="CLI">Command Line Interface (CLI)</option>
                                         {% endif %}
-
+                                
                                         {% if interface.tipo != "DB" %}
                                         <option value="DB">Conexão com Banco de Dados</option>
                                         {% endif %}
+                                
+                                        {% if interface.tipo != "Email" %}
+                                        <option value="Email">Email</option>
+                                        {% endif %}
+                                
+                                        {% if interface.tipo != "File Exchange" %}
+                                        <option value="File Exchange">Troca de Arquivos (CSV, XML, JSON)</option>
+                                        {% endif %}
+                                
+                                        {% if interface.tipo != "GraphQL API" %}
+                                        <option value="GraphQL API">GraphQL API</option>
+                                        {% endif %}
+                                
+                                        {% if interface.tipo != "gRPC" %}
+                                        <option value="gRPC">gRPC</option>
+                                        {% endif %}
+                                
+                                        {% if interface.tipo != "MQTT" %}
+                                        <option value="MQTT">MQTT</option>
+                                        {% endif %}
+                                
+                                        {% if interface.tipo != "REST API" %}
+                                        <option value="REST API">REST API</option>
+                                        {% endif %}
+                                
+                                        {% if interface.tipo != "RPC" %}
+                                        <option value="RPC">RPC</option>
+                                        {% endif %}
+                                
+                                        {% if interface.tipo != "SFTP" %}
+                                        <option value="SFTP">SFTP</option>
+                                        {% endif %}
+                                
+                                        {% if interface.tipo != "SOAP" %}
+                                        <option value="SOAP">SOAP</option>
+                                        {% endif %}
+                                
+                                        {% if interface.tipo != "WebSocket" %}
+                                        <option value="WebSocket">WebSocket</option>
+                                        {% endif %}
+                                
+                                        {% if interface.tipo != "Outro" %}
+                                        <option value="Outro">Outro</option>
+                                        {% endif %}
                                     </select>
+                                    <div class="invalid-feedback">Este campo é obrigatório.</div>
                                 </div>
 
+                                <div class="col-md-12 mb-3" id="otherTypeContainer" style="display:none;">
+                                    <input type="text" name="othertype" id="othertype" class="form-control" placeholder="Descreva o tipo da interface">
+                                    <div class="invalid-feedback">Este campo é obrigatório.</div>
+                                </div>
+                                
                                 <div class="col-md-12 mb-3">
                                     <input class="form-control" type="text" name="endpoint" value="{{interface.endpoint}}" placeholder="URL do endpoint ou cadeia de conexão" required>
                                 </div>
 
                                 <div class="col-md-12 mb-3">
                                     <select name="formato_dados" class="form-select" required id="formatoDados">
-                                        <option selected value="{{interface.formato_dados}}">{{interface.formato_dados}}</option>
-
+                                        <option selected value="{{ interface.formato_dados }}">{{ interface.formato_dados }}</option>
+                                
+                                        {% if interface.formato_dados != "Avro" %}
+                                        <option value="Avro">Apache Avro</option>
+                                        {% endif %}
+                                
+                                        {% if interface.formato_dados != "CSV" %}
+                                        <option value="CSV">CSV</option>
+                                        {% endif %}
+                                
+                                        {% if interface.formato_dados != "INI" %}
+                                        <option value="INI">INI (Initialization files)</option>
+                                        {% endif %}
+                                
                                         {% if interface.formato_dados != "JSON" %}
                                         <option value="JSON">JSON</option>
                                         {% endif %}
-
+                                
+                                        {% if interface.formato_dados != "MessagePack" %}
+                                        <option value="MessagePack">MessagePack</option>
+                                        {% endif %}
+                                
+                                        {% if interface.formato_dados != "Protobuf" %}
+                                        <option value="Protobuf">Protobuf (Protocol Buffers)</option>
+                                        {% endif %}
+                                
+                                        {% if interface.formato_dados != "Thrift" %}
+                                        <option value="Thrift">Apache Thrift</option>
+                                        {% endif %}
+                                
                                         {% if interface.formato_dados != "XML" %}
                                         <option value="XML">XML</option>
                                         {% endif %}
+                                
+                                        {% if interface.formato_dados != "YAML" %}
+                                        <option value="YAML">YAML</option>
+                                        {% endif %}
                                     </select>
+                                    <div class="invalid-feedback">Este campo é obrigatório.</div>
                                 </div>
+
 
                                 <div id="camposJSON_XML" style="display: none;">
                                     <div class="col-md-12 mb-3">
@@ -127,13 +208,29 @@
                                 <div class="col-md-12 mb-4">
                                     <label for="autenticacao" class="form-label">Requisitos de Autênticação</label>
                                     <select class="form-select" id="autenticacao" name="autenticacao[]" multiple required style="width: 100%">
-                                        <option value="oauth" {% if "oauth" in interface.autenticacao %}selected{% endif %}>OAuth</option>
-                                        <option value="basic_auth" {% if "basic_auth" in interface.autenticacao %}selected{% endif %}>Basic Auth</option>
+                                        <option value="active_directory" {% if "active_directory" in interface.autenticacao %}selected{% endif %}>Active Directory</option>
                                         <option value="api_keys" {% if "api_keys" in interface.autenticacao %}selected{% endif %}>API Keys</option>
+                                        <option value="basic_auth" {% if "basic_auth" in interface.autenticacao %}selected{% endif %}>Basic Auth</option>
                                         <option value="bearer_token" {% if "bearer_token" in interface.autenticacao %}selected{% endif %}>Bearer Token</option>
+                                        <option value="biometric" {% if "biometric" in interface.autenticacao %}selected{% endif %}>Biometria (Face ID, impressão digital)</option>
+                                        <option value="client_certificate" {% if "client_certificate" in interface.autenticacao %}selected{% endif %}>Client Certificate</option>
+                                        <option value="device_token" {% if "device_token" in interface.autenticacao %}selected{% endif %}>Device Token</option>
+                                        <option value="fingerprint" {% if "fingerprint" in interface.autenticacao %}selected{% endif %}>Digital Fingerprint</option>
+                                        <option value="hardware_token" {% if "hardware_token" in interface.autenticacao %}selected{% endif %}>Hardware Token (e.g., YubiKey)</option>
+                                        <option value="jwt" {% if "jwt" in interface.autenticacao %}selected{% endif %}>JWT (JSON Web Token)</option>
+                                        <option value="kerberos" {% if "kerberos" in interface.autenticacao %}selected{% endif %}>Kerberos</option>
+                                        <option value="ldap" {% if "ldap" in interface.autenticacao %}selected{% endif %}>LDAP (Lightweight Directory Access Protocol)</option>
+                                        <option value="mfa" {% if "mfa" in interface.autenticacao %}selected{% endif %}>MFA (Multi-Factor Authentication)</option>
+                                        <option value="mutual_tls" {% if "mutual_tls" in interface.autenticacao %}selected{% endif %}>Mutual TLS (mTLS)</option>
+                                        <option value="oauth" {% if "oauth" in interface.autenticacao %}selected{% endif %}>OAuth</option>
+                                        <option value="openid_connect" {% if "openid_connect" in interface.autenticacao %}selected{% endif %}>OpenID Connect</option>
+                                        <option value="otp" {% if "otp" in interface.autenticacao %}selected{% endif %}>OTP (One-Time Password)</option>
+                                        <option value="saml" {% if "saml" in interface.autenticacao %}selected{% endif %}>SAML (Security Assertion Markup Language)</option>
+                                        <option value="session_cookie" {% if "session_cookie" in interface.autenticacao %}selected{% endif %}>Session Cookie</option>
                                     </select>
+                                    <div class="invalid-feedback">Este campo é obrigatório.</div>
                                 </div>
-                                
+
                                 <div class="col-md-12 mb-3">
                                     <textarea class="form-control" value="{{interface.throttling}}" name="throttling" placeholder="Limites de Tolerância (Throttling, rate limits, etc.)" rows="3">{{interface.throttling}}</textarea>
                                 </div>
@@ -193,6 +290,66 @@
                 dropdownAutoWidth: true,
                 width: 'resolve'
             });
+        });
+
+        document.querySelector("form").addEventListener("submit", function (e) {
+            const tipoSelect = document.getElementById("tipo");
+            const otherInput = document.getElementById("othertype");
+
+            if (tipoSelect.value === "Outro" && otherInput.value.trim()) {
+                const hiddenTipo = document.createElement("input");
+                hiddenTipo.type = "hidden";
+                hiddenTipo.name = "tipo";
+                hiddenTipo.value = otherInput.value.trim();
+
+                this.appendChild(hiddenTipo);
+            }
+        });
+
+        document.getElementById("submit").addEventListener("click", function (event) {
+            const nome = document.getElementById("nome");
+            const tipo = document.getElementById("tipo");
+            const outrosTipo = document.getElementById("otherType");
+            const outrosTipoContainer = document.getElementById("otherTypeContainer");
+            const formatoDados = $('#formatoDados').val();
+            const autenticacao = $('#autenticacao').val();
+        
+            let isValid = true;
+        
+            nome.classList.remove("is-invalid");
+            tipo.classList.remove("is-invalid");
+            outrosTipo?.classList.remove("is-invalid");
+            document.getElementById("formatoDados").classList.remove("is-invalid");
+            document.getElementById("autenticacao").classList.remove("is-invalid");
+        
+            if (!nome.value.trim()) {
+                nome.classList.add("is-invalid");
+                isValid = false;
+            }
+        
+            if (!tipo.value && outrosTipoContainer.style.display === 'none') {
+                tipo.classList.add("is-invalid");
+                isValid = false;
+            }
+        
+            if (outrosTipoContainer.style.display !== 'none' && !outrosTipo.value.trim()) {
+                outrosTipo.classList.add("is-invalid");
+                isValid = false;
+            }
+        
+            if (!formatoDados || formatoDados.length === 0) {
+                document.getElementById("formatoDados").classList.add("is-invalid");
+                isValid = false;
+            }
+
+            if (!autenticacao || autenticacao.length === 0) {
+                document.getElementById("autenticacao").classList.add("is-invalid");
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                event.preventDefault(); 
+            }
         });
     </script>
 </body>
